@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Arduino_FreeRTOS.h>
-#include "PIDcontroller.h"
+#include ".PIDcontroller.h"
 
 /**
  * @file main_PID_tester.cpp
@@ -40,7 +40,7 @@ void vPIDControlTask(void *pvParameters) {
     ();
 
         // Compute the PID output
-        float output = tempController.compute(measuredValue);
+        float output = tempController.calculatePID(measuredValue);
 
         // Convert output to uint8_t duty cycle (0-100%)
         uint8_t temperature = static_cast<uint8_t>(output);
