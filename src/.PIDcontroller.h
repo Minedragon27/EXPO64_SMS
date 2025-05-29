@@ -10,16 +10,28 @@
  * to compute the control signal for a given measured value.
  */
 
+#include <Arduino.h>
 
-#include <Arduino.h> 
-
-class PIDcontroller {
+class PIDcontroller
+{
 public:
-    // Constructor with default parameters
+// Constructor declaration and inline definition
     PIDcontroller(float kp, float ki, float kd,
                   float setpoint, float integralMin = 0.0,
                   float integralMax = 100.0, float outputMin = 0.0,
-                  float outputMax = 100.0);
+                  float outputMax = 100.0)
+        : _kp(kp),
+          _ki(ki),
+          _kd(kd),
+          _setpoint(setpoint),
+          _integral(0.0f),
+          _previousError(0.0f),
+          _integralMin(integralMin),
+          _integralMax(integralMax),
+          _outputMin(outputMin),
+          _outputMax(outputMax)
+    {
+    }
 
     // Set PID gains
     void setGains(float kp, float ki, float kd);
@@ -33,35 +45,38 @@ public:
     // Set output limits (e.g., duty cycle 0-100%)
     void setOutputLimits(float min, float max);
 
-    // Reset integral and previous error 
+    // Reset integral and previous error
     void reset();
 
     // Compute PID output given the current measured value
     // to be called in the control task i think
-    float calculatePID(float measuredValue){
-    // Calculate error
-    float error = pid->setpoint - measuredValue;
+    float calculatePID(float measuredValue)
+    {
+        float error = _setpoint - measuredValue;
 
-    // Proportional term
-    float proportional = pid->kp * error;
+        float proportional = _kp * error;
 
-    // Integral term
-    pid->integral += pid->ki * error; // Accumulate the integral
-    if (pid->integral > 100) pid->integral = 100; // Anti-windup
-    if (pid->integral < 5) pid->integral = 5 ;
+        _integral += _ki * error; // Accumulate the integral
 
-    // Derivative term
-    float derivative = pid->kd * (error - pid->previousError);
-    pid->previousError = error; // Store current error for next derivative calculation
+        // Anti-windup clamping
+        if (_integral > _integralMax)
+            _integral = _integralMax;
+        if (_integral < _integralMin)
+            _integral = _integralMin;
 
-    // Calculate total output
-    float output = proportional + pid->integral + derivative;
+        float derivative = _kd * (error - _previousError);
+        _previousError = error; // Store current error for next derivative calculation
 
-    // Limit output to a valid range (#todo define this, might have to depend on each parementer)
-    if (output > 100) output = 100;
-    if (output < 0) output = 0;
+        // Calculate total output
+        float output = proportional + _integral + derivative;
 
-    return output; // Return the adjustment value
+        // Limit output to a valid range
+        if (output > _outputMax)
+            output = _outputMax;
+        if (output < _outputMin)
+            output = _outputMin;
+
+        return output; // return the adjustment value
     };
 
 private:
@@ -82,4 +97,3 @@ private:
 };
 
 #endif // PIDCONTROLLER_H
-
