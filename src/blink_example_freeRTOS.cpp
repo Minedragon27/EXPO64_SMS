@@ -20,6 +20,32 @@
 TaskHandle_t loop_task, blinky_task;
 
 /**************************************************************************************
+ *FUNCTIONS
+ **************************************************************************************/
+void loop_thread_func(void *pvParameters)
+{
+  for(;;)
+  {
+    loop();
+    taskYIELD();
+  }
+}
+
+void blinky_thread_func(void *pvParameters)
+{
+  /* setup() */
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
+  /* loop() */
+  for(;;)
+  {
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    vTaskDelay(configTICK_RATE_HZ);
+  }
+}
+
+/**************************************************************************************
  * SETUP/LOOP
  **************************************************************************************/
 
@@ -90,25 +116,4 @@ void loop()
   vTaskDelay(configTICK_RATE_HZ/4);
 }
 
-void loop_thread_func(void *pvParameters)
-{
-  for(;;)
-  {
-    loop();
-    taskYIELD();
-  }
-}
 
-void blinky_thread_func(void *pvParameters)
-{
-  /* setup() */
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
-  /* loop() */
-  for(;;)
-  {
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    vTaskDelay(configTICK_RATE_HZ);
-  }
-}
