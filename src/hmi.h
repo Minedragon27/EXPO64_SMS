@@ -4,10 +4,14 @@ class HMI
 {
     enum parameter {none=0,temperature, humidity, co2, light};
     public: parameter currentParameter=none;
-    private: int pinA,pinB,pinC,pinButtons;
-    private: short resistances[8];//resistances for the button circuit
 
-    HMI(int A,int B, int C, int Buttons, short R[8])
+    private: short resistances[8];//resistances for the button circuit
+    private: int pinA,pinB,pinC,pinButtons;
+    private: int pinLED[4];//led pins
+
+    
+
+    HMI(int A,int B, int C, int Buttons, short R[8], int LED[4])
     {
         pinA=A;//rotary enc A
         pinMode(A,INPUT);
@@ -18,6 +22,7 @@ class HMI
         pinButtons=Buttons;//analog pin for other buttons
         pinMode(Buttons,INPUT);
         memcpy(resistances, R, sizeof(R));//resistances in Ohms, code coppies R into resistances
+        memcpy(pinLED,LED,sizeof(LED));
 
     }
 
@@ -44,6 +49,12 @@ class HMI
         }
         return output;
     }
+    void setLEDs(byte LEDs)
+    {
+        for(int i=0;i<4;i++) digitalWrite(pinLED[i],readBit(LEDs,i));//writes each bit to its corresponding LED pin
+    }
+    
+
     bool readBit(byte variable, int position) 
     {
         return (variable >> position) & 1;
