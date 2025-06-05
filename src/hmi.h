@@ -14,6 +14,7 @@ class HMI
 
 
     public:
+
     HMI(int A,int B, int C, int Buttons, short R[8], int LED[4],TFT &TFTscreen): screen(TFTscreen)
     {
         pinA=A;//rotary enc A
@@ -25,6 +26,7 @@ class HMI
         pinButtons=Buttons;//analog pin for other buttons
         pinMode(Buttons,INPUT);
         memcpy(resistances, R, sizeof(R));//resistances in Ohms, code copies R into resistances
+
         memcpy(pinLED,LED,sizeof(LED));
         screen=TFTscreen;
     }
@@ -34,6 +36,7 @@ class HMI
         *ptrA=digitalRead(pinA);//writes value of A to address
         *ptrB=digitalRead(pinB);//writes value of B to address
     }
+
     byte incrementRotation(byte* ptrEncState)
     {
         int encState=*ptrEncState;
@@ -109,6 +112,7 @@ class HMI
         *ptrEncState=2*knobA+knobB;
         return increment;
     }
+
     byte readButtons()
     {
         byte output=0;
@@ -179,5 +183,5 @@ class HMI
         screen.setTextSize(textSize);
         screen.text(buffer, x, y);
     }
-    
+
 };
