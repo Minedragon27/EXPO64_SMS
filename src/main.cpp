@@ -8,7 +8,7 @@ short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
 TFT TFTScreen;
 HMI hmi1(1,2,3,4,R,LED,TFTScreen);
-MHZ19 sensorCO2($Serial1);
+MHZ19 sensorCO2(&Serial1);
 
 byte currentTemperature;
 byte targetTemperature;
