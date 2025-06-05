@@ -13,7 +13,7 @@ class HMI
     private: int pinLED[4];//led pins
 
 
-    
+    public:
 
     HMI(int A,int B, int C, int Buttons, short R[8], int LED[4],TFT &TFTscreen): screen(TFTscreen)
     {
@@ -25,7 +25,8 @@ class HMI
         pinMode(C,INPUT);
         pinButtons=Buttons;//analog pin for other buttons
         pinMode(Buttons,INPUT);
-        memcpy(resistances, R, sizeof(R));//resistances in Ohms, code coppies R into resistances
+        memcpy(resistances, R, sizeof(R));//resistances in Ohms, code copies R into resistances
+
         memcpy(pinLED,LED,sizeof(LED));
         screen=TFTscreen;
     }
@@ -34,6 +35,82 @@ class HMI
     {
         *ptrA=digitalRead(pinA);//writes value of A to address
         *ptrB=digitalRead(pinB);//writes value of B to address
+    }
+
+    byte incrementRotation(byte* ptrEncState)
+    {
+        int encState=*ptrEncState;
+        bool knobA,knobB=0;
+        readRotaryEncoder(&knobA,&knobB);
+        byte increment=0;
+        switch (encState)
+        {
+        case 0://state 0            
+            switch (knobA*2+knobB)
+            {
+            case 2:
+                increment++;
+                
+                break;
+            case 1:
+                increment--;
+                break;
+            case 0:
+                break;
+            default://error
+                break;
+            }          
+            break;
+        case 1:
+            switch (knobA*2+knobB)
+            {
+            case 0:
+                increment++;
+                break;
+            case 3:
+                increment--;
+                break;
+            case 1:
+                break;
+            default://error
+                break;
+            }          
+            break;
+        case 2:
+            switch (knobA*2+knobB)
+            {
+            case 3:
+                increment++;
+                break;
+            case 0:
+                increment--;
+                break;
+            case 1:
+                break;
+            default://error
+                break;
+            }          
+            break;
+        case 3:
+            switch (knobA*2+knobB)
+            {
+            case 1:
+                increment++;
+                break;
+            case 2:
+                increment--;
+                break;
+            case 3:
+                break;
+            default://error
+                break;
+            }          
+            break;    
+        default://error
+            break;
+        }
+        *ptrEncState=2*knobA+knobB;
+        return increment;
     }
 
     byte readButtons()
@@ -106,4 +183,5 @@ class HMI
         screen.setTextSize(textSize);
         screen.text(buffer, x, y);
     }
+
 };
