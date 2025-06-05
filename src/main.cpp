@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include <MHZ19.h>
 #include <hmi.h>
 
 
@@ -8,6 +8,7 @@ short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
 TFT TFTScreen;
 HMI hmi1(1,2,3,4,R,LED,TFTScreen);
+MHZ19 sensorCO2($Serial1);
 
 byte currentTemperature;
 byte targetTemperature;
@@ -21,6 +22,8 @@ byte targetLight;
 // put function declarations here:
 int myFunction(int, int);
 void UpdateTargetParameters();
+void readCO2();
+
 void setup() {
   // put your setup code here, to run once:
   int result = myFunction(2, 3);
@@ -116,3 +119,4 @@ void UpdateTargetParameters()
     }
 
 }
+//to use: currentCO2=sensorCO2.getCO2(); can also use sensorCO2.getTemperature(); and senosrCO2.getAccuracy(); https://github.com/strange-v/MHZ19/blob/master/examples/hw_get_values/hw_get_values.ino
