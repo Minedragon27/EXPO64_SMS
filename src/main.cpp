@@ -7,9 +7,18 @@ short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
 TFT TFTScreen;
 HMI hmi1(1,2,3,4,R,LED,TFTScreen);
-void UpdateTargetParameters(byte* ptrCurrentTemperature, byte targetTemperature, byte* ptrCurrentHumidity, byte targetHumidity, byte* ptrCurrentCO2, byte targetCO2,byte* ptrCurrentLight, byte targetLight)
+
+byte currentTemperature;
+byte targetTemperature;
+byte currentHumidity;
+byte targetHumidity;
+byte currentCO2;
+byte targetCO2;
+byte currentLight;
+byte targetLight;
+
+void UpdateTargetParameters()
 {
-    //current values are pointers so they can be updated while the user is changing the current value
     byte buttons=hmi1.readButtons();
     bool firstLoopIteration=true;//used by loops to check if they have just started
     byte shownTarget=0; //initialize shownTarget variable, changed when rotating the knob
@@ -36,7 +45,7 @@ void UpdateTargetParameters(byte* ptrCurrentTemperature, byte targetTemperature,
         buttons=hmi1.readButtons();
         if (hmi1.readBit(buttons,6)) targetTemperature=shownTarget;//confirm target value
         if (hmi1.readBit(buttons,5)) shownTarget=targetTemperature;//reset target value
-        hmi1.writeToScreen(*ptrCurrentTemperature,shownTarget);//show values
+        hmi1.writeToScreen(currentTemperature,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
     while(hmi1.readBit(buttons,1))//go to humidity menu
@@ -52,7 +61,7 @@ void UpdateTargetParameters(byte* ptrCurrentTemperature, byte targetTemperature,
         buttons=hmi1.readButtons();
         if (hmi1.readBit(buttons,6)) targetHumidity=shownTarget;//confirm target value
         if (hmi1.readBit(buttons,5)) shownTarget=targetHumidity;//reset target value
-        hmi1.writeToScreen(*ptrCurrentHumidity,shownTarget);//show values
+        hmi1.writeToScreen(currentHumidity,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically;
     }
     while(hmi1.readBit(buttons,2))//go to CO2 menu
@@ -68,7 +77,7 @@ void UpdateTargetParameters(byte* ptrCurrentTemperature, byte targetTemperature,
         buttons=hmi1.readButtons();
         if (hmi1.readBit(buttons,6)) targetCO2=shownTarget;//confirm target value
         if (hmi1.readBit(buttons,5)) shownTarget=targetCO2;//reset target value
-        hmi1.writeToScreen(*ptrCurrentCO2,shownTarget);//show values
+        hmi1.writeToScreen(currentCO2,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
     while(hmi1.readBit(buttons,3))//go to light menu
@@ -84,7 +93,7 @@ void UpdateTargetParameters(byte* ptrCurrentTemperature, byte targetTemperature,
         buttons=hmi1.readButtons();
         if (hmi1.readBit(buttons,6)) targetLight=shownTarget;//confirm target value
         if (hmi1.readBit(buttons,5)) shownTarget=targetLight;//reset target value
-        hmi1.writeToScreen(*ptrCurrentLight,shownTarget);//show values
+        hmi1.writeToScreen(currentLight,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
 }
