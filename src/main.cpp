@@ -1,9 +1,13 @@
 #include <Arduino.h>
-
 #include <hmi.h>
+#include "CHT8305.h"
 
+// objects --------------------------------
+CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
+//       use getHumidity() and getTemperature()
+//-----------------------------------------
 
-//testing variables
+//testing variables-------------------------
 short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
 TFT TFTScreen;
@@ -17,7 +21,9 @@ byte currentCO2;
 byte targetCO2;
 byte currentLight;
 byte targetLight;
+//-----------------------------------------
 
+//functions ---------------------------------
 void UpdateTargetParameters()
 {
     byte buttons=hmi1.readButtons();
@@ -97,12 +103,19 @@ void UpdateTargetParameters()
         hmi1.writeToScreen(currentLight,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
+}
+
+//----------------------------------------
+
 
 
 void setup() {
-  // put your setup code here, to run once:
-    //
-
+  // setup for temp_hum sensor -----------
+  Serial.begin(115200);
+  Wire.begin();
+  Wire.setClock(400000);
+  CHT.begin();
+  // ---------------------------------------
 }   
 
 void loop() {
