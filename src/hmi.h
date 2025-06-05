@@ -34,7 +34,81 @@ class HMI
         *ptrA=digitalRead(pinA);//writes value of A to address
         *ptrB=digitalRead(pinB);//writes value of B to address
     }
-
+    byte incrementRotation(byte* ptrEncState)
+    {
+        int encState=*ptrEncState;
+        bool knobA,knobB=0;
+        readRotaryEncoder(&knobA,&knobB);
+        byte increment=0;
+        switch (encState)
+        {
+        case 0://state 0            
+            switch (knobA*2+knobB)
+            {
+            case 2:
+                increment++;
+                
+                break;
+            case 1:
+                increment--;
+                break;
+            case 0:
+                break;
+            default://error
+                break;
+            }          
+            break;
+        case 1:
+            switch (knobA*2+knobB)
+            {
+            case 0:
+                increment++;
+                break;
+            case 3:
+                increment--;
+                break;
+            case 1:
+                break;
+            default://error
+                break;
+            }          
+            break;
+        case 2:
+            switch (knobA*2+knobB)
+            {
+            case 3:
+                increment++;
+                break;
+            case 0:
+                increment--;
+                break;
+            case 1:
+                break;
+            default://error
+                break;
+            }          
+            break;
+        case 3:
+            switch (knobA*2+knobB)
+            {
+            case 1:
+                increment++;
+                break;
+            case 2:
+                increment--;
+                break;
+            case 3:
+                break;
+            default://error
+                break;
+            }          
+            break;    
+        default://error
+            break;
+        }
+        *ptrEncState=2*knobA+knobB;
+        return increment;
+    }
     byte readButtons()
     {
         byte output=0;
@@ -105,4 +179,5 @@ class HMI
         screen.setTextSize(textSize);
         screen.text(buffer, x, y);
     }
+    
 };
