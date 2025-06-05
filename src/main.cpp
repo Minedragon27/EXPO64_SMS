@@ -9,15 +9,16 @@ int LED[4]={13,14,15,16};
 TFT TFTScreen;
 HMI hmi1(1,2,3,4,R,LED,TFTScreen);
 MHZ19 sensorCO2(&Serial1);
+//to use: currentCO2=sensorCO2.getCO2(); can also use sensorCO2.getTemperature(); and senosrCO2.getAccuracy(); https://github.com/strange-v/MHZ19/blob/master/examples/hw_get_values/hw_get_values.ino
 
-byte currentTemperature;
-byte targetTemperature;
-byte currentHumidity;
-byte targetHumidity;
-byte currentCO2;
-byte targetCO2;
-byte currentLight;
-byte targetLight;
+float currentTemperature;
+float targetTemperature;
+float currentHumidity;
+float targetHumidity;
+float currentCO2;
+float targetCO2;
+float currentLight;
+float targetLight;
 
 // put function declarations here:
 int myFunction(int, int);
@@ -42,7 +43,7 @@ void UpdateTargetParameters()
 {
     byte buttons=hmi1.readButtons();
     bool firstLoopIteration=true;//used by loops to check if they have just started
-    byte shownTarget=0; //initialize shownTarget variable, changed when rotating the knob
+    float shownTarget=0; //initialize shownTarget variable, changed when rotating the knob
 
     float scalingTemperature=0.5;//how much should it change per step of the knob
     float scalingHumidity=0.5;
@@ -119,4 +120,4 @@ void UpdateTargetParameters()
     }
 
 }
-//to use: currentCO2=sensorCO2.getCO2(); can also use sensorCO2.getTemperature(); and senosrCO2.getAccuracy(); https://github.com/strange-v/MHZ19/blob/master/examples/hw_get_values/hw_get_values.ino
+

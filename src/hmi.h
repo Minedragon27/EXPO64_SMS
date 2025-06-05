@@ -136,7 +136,7 @@ class HMI
         for(int i=0;i<4;i++) digitalWrite(pinLED[i],readBit(LEDs,i));//writes each bit to its corresponding LED pin
     }
 
-    void writeToScreen(byte currentValue, byte targetValue)
+    void writeToScreen(float currentValue, float targetValue)
     {   
         String unit="";
         switch (currentParameter)//chooses the unit to be displayed
