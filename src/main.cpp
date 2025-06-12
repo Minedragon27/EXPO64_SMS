@@ -1,6 +1,7 @@
 #include <Arduino.h>
-#include <hmi.h>
-#include "CHT8305.h"
+//#include <hmi.h>
+#include <Arduino_FreeRTOS.h>
+#include <CHT8305.h> //tempHum sensor
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
@@ -10,8 +11,8 @@ CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
 //testing variables-------------------------
 short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
-TFT TFTScreen;
-HMI hmi1(1,2,3,4,R,LED,TFTScreen);
+//TFT TFTScreen; commented out cause library is not added
+//HMI hmi1(1,2,3,4,R,LED,TFTScreen);
 
 byte currentTemperature;
 byte targetTemperature;
@@ -24,6 +25,7 @@ byte targetLight;
 //-----------------------------------------
 
 //functions ---------------------------------
+/*
 void UpdateTargetParameters()
 {
     byte buttons=hmi1.readButtons();
@@ -103,7 +105,7 @@ void UpdateTargetParameters()
         hmi1.writeToScreen(currentLight,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
-}
+}*/
 
 void getSensorData(void * parameters){
     for(;;){
@@ -120,7 +122,7 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   Wire.setClock(400000);
-  CHT.begin();
+  tempHumSensor.begin();
   // ---------------------------------------
 }   
 
