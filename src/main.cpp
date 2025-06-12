@@ -140,10 +140,16 @@ void LogData()
     }
 }
 void dataOutput()
-{
-    if(false)//trigger condition TODO
+{   
+    int incomingMessage=0;
+    if (Serial.available() == 0) return;//no message received
+    else
     {
-        for(int i=0;i<posData;i++)
+        incomingMessage = Serial.read();
+    }
+    if(incomingMessage==int('p'))//trigger condition is receiving a 'p' on serial
+    {
+        for(int i=0;i<=posData;i++)
         {
             Serial.println("----------------");
             Serial.println("Time: "+String(dataLog[i][0]));
