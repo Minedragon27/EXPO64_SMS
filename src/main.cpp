@@ -11,7 +11,7 @@ CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
 short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
 
-const byte dataLen=10000;//how many data snapshots are kept
+const byte dataLen=10000;//how many data snapshots are kept, 10000 min=1 week 200kB
 float dataLog[dataLen][5];//2d array to store the values
 unsigned long timeOfLastLog=0;
 byte posData=0;//keeps track of which row of the array is the current one
