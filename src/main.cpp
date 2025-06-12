@@ -105,6 +105,12 @@ void UpdateTargetParameters()
     }
 }
 
+void getSensorData(void * parameters){
+    for(;;){
+
+        vTaskDelay(1000/ portTICK_PERIOD_MS );
+    }
+}
 //----------------------------------------
 
 
