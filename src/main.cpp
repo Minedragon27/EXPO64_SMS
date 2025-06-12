@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <hmi.h>
-#include "CHT8305.h"
+#include <CHT8305.h> 
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
@@ -10,7 +10,17 @@ CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
 //testing variables-------------------------
 short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
-TFT TFTScreen;
+
+const byte dataLen=10000;//how many data snapshots are kept
+float dataLog[dataLen][5];//2d array to store the values
+unsigned long timeOfLastLog=0;
+byte posData=0;//keeps track of which row of the array is the current one
+
+#define cs 10
+#define dc 9
+#define rst 8
+
+TFT TFTScreen = TFT(cs,dc,rst);
 HMI hmi1(1,2,3,4,R,LED,TFTScreen);
 
 byte currentTemperature;
@@ -104,7 +114,31 @@ void UpdateTargetParameters()
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
 }
-
+void LogData()
+{
+    unsigned long time=millis();//take the current time
+    if(time-timeOfLastLog>1000*60)//check if 1 minute has passed since last call
+    {
+        timeOfLastLog=time;
+        if(posData==dataLen-1)//array has been filled and must be shifted
+        {
+            for(int i=0;i<dataLen-1;i++)//shifted moves all data snapshots down by 1 row in the array, skips the last one since it is overwritten later
+            {
+                dataLog[i][0]=dataLog[i+1][0];
+                dataLog[i][1]=dataLog[i+1][1];
+                dataLog[i][2]=dataLog[i+1][2];
+                dataLog[i][3]=dataLog[i+1][3];
+                dataLog[i][4]=dataLog[i+1][4];
+            }
+        }
+        else posData++;//else increment to next pos
+        dataLog[posData][0]=time/1000;//save current values to arrays, time is saved in seconds
+        dataLog[posData][1]=currentTemperature;
+        dataLog[posData][2]=currentHumidity;
+        dataLog[posData][3]=currentCO2;
+        dataLog[posData][4]=currentLight;
+    }
+}
 //----------------------------------------
 
 
@@ -114,7 +148,7 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   Wire.setClock(400000);
-  CHT.begin();
+  tempHumSensor.begin();
   // ---------------------------------------
 }   
 
