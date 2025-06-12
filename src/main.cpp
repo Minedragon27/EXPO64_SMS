@@ -10,7 +10,11 @@ CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
 //testing variables-------------------------
 short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
-TFT TFTScreen;
+
+#define cs 10
+#define dc 9
+#define rst 8
+TFT TFTScreen = TFT(cs,dc,rst);
 HMI hmi1(1,2,3,4,R,LED,TFTScreen);
 
 byte currentTemperature;
@@ -114,7 +118,7 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   Wire.setClock(400000);
-  CHT.begin();
+  //CHT.begin();
   // ---------------------------------------
 }   
 
