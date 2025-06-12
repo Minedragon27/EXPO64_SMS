@@ -139,6 +139,21 @@ void LogData()
         dataLog[posData][4]=currentLight;
     }
 }
+void dataOutput()
+{
+    if(false)//trigger condition TODO
+    {
+        for(int i=0;i<posData;i++)
+        {
+            Serial.println("----------------");
+            Serial.println("Time: "+String(dataLog[i][0]));
+            Serial.println("Temperature: "+String(dataLog[i][1]));
+            Serial.println("Humidity: "+String(dataLog[i][2]));
+            Serial.println("CO2: "+String(dataLog[i][3]));
+            Serial.println("Light: "+String(dataLog[i][4]));
+        }
+    }
+}
 //----------------------------------------
 
 
