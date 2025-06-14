@@ -23,14 +23,14 @@ byte posData=0;//keeps track of which row of the array is the current one
 
 HMI hmi1(1,2,3,4,R,LED);
 
-byte currentTemperature;
-byte targetTemperature;
-byte currentHumidity;
-byte targetHumidity;
+float currentTemperature;
+float targetTemperature;
+float currentHumidity;
+float targetHumidity;
 byte currentCO2;
 byte targetCO2;
-byte currentLight;
-byte targetLight;
+float currentLight;
+float targetLight;
 //-----------------------------------------
 
 //functions ---------------------------------
@@ -115,8 +115,10 @@ void UpdateTargetParameters()
     }
 }
 void LogData()
-{
+{   
+    
     unsigned long time=millis();//take the current time
+    if(timeOfLastLog>time) timeOfLastLog=0;//if millis() overflows, reset the timeOfLastLog as well
     if(time-timeOfLastLog>1000*60)//check if 1 minute has passed since last call
     {
         timeOfLastLog=time;
