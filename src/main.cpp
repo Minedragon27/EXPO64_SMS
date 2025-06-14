@@ -20,8 +20,8 @@ byte posData=0;//keeps track of which row of the array is the current one
 #define dc 9
 #define rst 8
 
-TFT TFTScreen = TFT(cs,dc,rst);
-HMI hmi1(1,2,3,4,R,LED,TFTScreen);
+
+HMI hmi1(1,2,3,4,R,LED);
 
 byte currentTemperature;
 byte targetTemperature;
