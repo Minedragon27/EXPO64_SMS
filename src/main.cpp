@@ -11,10 +11,10 @@ CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
 short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
 
-const byte dataLen=10000;//how many data snapshots are kept, 10000 min=1 week 200kB
+const short dataLen=8*60;//how many data snapshots are kept, 10000 min=1 week 200kB
 float dataLog[dataLen][5];//2d array to store the values
 unsigned long timeOfLastLog=0;
-byte posData=0;//keeps track of which row of the array is the current one
+short posData=0;//keeps track of which row of the array is the current one
 
 #define cs 10
 #define dc 9
@@ -27,8 +27,8 @@ float currentTemperature;
 float targetTemperature;
 float currentHumidity;
 float targetHumidity;
-byte currentCO2;
-byte targetCO2;
+int currentCO2;
+int targetCO2;
 float currentLight;
 float targetLight;
 //-----------------------------------------
@@ -38,7 +38,7 @@ void UpdateTargetParameters()
 {
     byte buttons=hmi1.readButtons();
     bool firstLoopIteration=true;//used by loops to check if they have just started
-    byte shownTarget=0; //initialize shownTarget variable, changed when rotating the knob
+    float shownTarget=0; //initialize shownTarget variable, changed when rotating the knob
 
     float scalingTemperature=0.5;//how much should it change per step of the knob
     float scalingHumidity=0.5;
