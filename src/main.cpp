@@ -9,28 +9,27 @@ CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
 
 //testing variables-------------------------
 short R[8]={5,6,7,8,9,10,11,12};
-int LED[4]={13,14,15,16};
+int LED[4]={5,6,7,12};
+
 
 const short dataLen=8*60;//how many data snapshots are kept, 10000 min=1 week 200kB
 float dataLog[dataLen][5];//2d array to store the values
 unsigned long timeOfLastLog=0;
 short posData=0;//keeps track of which row of the array is the current one
 
-#define cs 10
-#define dc 9
-#define rst 8
+Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
+Arduino_GFX *gfx =new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */);//objects used for LCD screen
 
+HMI hmi1=HMI(1,2,3,4,R,LED,gfx);
 
-HMI hmi1(1,2,3,4,R,LED);
-
-float currentTemperature;
-float targetTemperature;
-float currentHumidity;
-float targetHumidity;
-int currentCO2;
-int targetCO2;
-float currentLight;
-float targetLight;
+float currentTemperature=20;
+float targetTemperature=20;//default value
+float currentHumidity=20;
+float targetHumidity=20;
+int currentCO2=20;
+int targetCO2=20;
+float currentLight=20;
+float targetLight=20;
 //-----------------------------------------
 
 //functions ---------------------------------
@@ -168,14 +167,24 @@ void dataOutput()
 
 void setup() {
   // setup for temp_hum sensor -----------
-  Serial.begin(115200);
+  Serial.begin(9600);
+  gfx->begin();//initialize screen
+  gfx->fillScreen(BLACK);
+  gfx->setTextColor(RGB565(150,150,150));
+  hmi1.drawText("test",2,50);
   Wire.begin();
   Wire.setClock(400000);
   tempHumSensor.begin();
   // ---------------------------------------
+  
+  
 }   
 
 void loop() {
   // put your main code here, to run repeatedly:
+  hmi1.currentParameter=HMI::temperature;
+  currentTemperature=rand()%50;
+  hmi1.writeToScreen(currentTemperature,targetTemperature);
+  delay(5000);
 }
 

@@ -3,15 +3,17 @@
 
 class HMI
 {
-    enum parameter {none=0,temperature, humidity, co2, light};
+    public: enum parameter {none=0,temperature, humidity, co2, light};
     public: parameter currentParameter=none;
+    
     #define TFT_CS   10
     #define TFT_DC   9
     #define TFT_RST  8
     #define TFT_SCK  13
     #define TFT_MOSI 11
-    Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
-    Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */);
+
+    
+    private: Arduino_GFX *gfx;
 
     private: short resistances[8];//resistances for the button circuit
     private: int pinA,pinB,pinC,pinButtons;
@@ -20,7 +22,7 @@ class HMI
 
     public:
 
-    HMI(int A,int B, int C, int Buttons, short R[8], int LED[4])
+    HMI(int A,int B, int C, int Buttons, short R[8], int LED[4],Arduino_GFX* ptrGfx)
     {
         pinA=A;//rotary enc A
         pinMode(A,INPUT);
@@ -33,9 +35,9 @@ class HMI
         memcpy(resistances, R, sizeof(R));//resistances in Ohms, code copies R into resistances
 
         memcpy(pinLED,LED,sizeof(LED));
-        gfx->begin();//initialize screen
-        gfx->fillScreen(BLACK);
-        gfx->setTextColor(RGB565(150,150,150));
+        
+        gfx=ptrGfx;
+        
 
     }
 
@@ -146,6 +148,7 @@ class HMI
 
     void writeToScreen(float currentValue, float targetValue)
     {   
+        gfx->fillScreen(BLACK);
         String unit="";
         switch (currentParameter)//chooses the unit to be displayed
         {
