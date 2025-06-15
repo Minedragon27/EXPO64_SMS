@@ -1,13 +1,20 @@
 #include <Arduino.h>
-#include <TFT.h>
-#include <SPI.h>
+#include <Arduino_GFX_Library.h>
 
 class HMI
 {
-    enum parameter {none=0,temperature, humidity, co2, light};
+    public: enum parameter {none=0,temperature, humidity, co2, light};
     public: parameter currentParameter=none;
+    
+    #define TFT_CS   10
+    #define TFT_DC   9
+    #define TFT_RST  8
+    #define TFT_SCK  13
+    #define TFT_MOSI 11
 
-    private: TFT &screen;
+    
+    private: Arduino_GFX *gfx;
+
     private: short resistances[8];//resistances for the button circuit
     private: int pinA,pinB,pinC,pinButtons;
     private: int pinLED[4];//led pins
@@ -15,7 +22,7 @@ class HMI
 
     public:
 
-    HMI(int A,int B, int C, int Buttons, short R[8], int LED[4],TFT &TFTscreen): screen(TFTscreen)
+    HMI(int A,int B, int C, int Buttons, short R[8], int LED[4],Arduino_GFX* ptrGfx)
     {
         pinA=A;//rotary enc A
         pinMode(A,INPUT);
@@ -28,7 +35,10 @@ class HMI
         memcpy(resistances, R, sizeof(R));//resistances in Ohms, code copies R into resistances
 
         memcpy(pinLED,LED,sizeof(LED));
-        screen=TFTscreen;
+        
+        gfx=ptrGfx;
+        
+
     }
 
     void readRotaryEncoder(bool* ptrA,bool* ptrB)
@@ -136,8 +146,9 @@ class HMI
         for(int i=0;i<4;i++) digitalWrite(pinLED[i],readBit(LEDs,i));//writes each bit to its corresponding LED pin
     }
 
-    void writeToScreen(byte currentValue, byte targetValue)
+    void writeToScreen(float currentValue, float targetValue)
     {   
+        gfx->fillScreen(BLACK);
         String unit="";
         switch (currentParameter)//chooses the unit to be displayed
         {
@@ -160,8 +171,8 @@ class HMI
 
         drawText("Current:",3,5);
         drawText(String(currentValue)+unit,2,10+3*8);
-        drawText("Target:",3,screen.height()/2+5);
-        drawText(String(targetValue)+unit,2,screen.height()/2+5+10+3*8);
+        drawText("Target:",3,128/2+5);
+        drawText(String(targetValue)+unit,2,128/2+5+10+3*8);
     }
 
     bool readBit(byte variable, int position) 
@@ -174,14 +185,11 @@ class HMI
     }
     void drawText( const String &text, int textSize, int y) //draws horizontally centered text
     {
-        char buffer[text.length() + 1];
-        text.toCharArray(buffer, sizeof(buffer));
-
-        int textWidth = text.length() * 6 * textSize;
-        int x = (screen.width() - textWidth) / 2;
-
-        screen.setTextSize(textSize);
-        screen.text(buffer, x, y);
+        int textWidth = text.length() * 6 * textSize; // approx. width per character
+        int x = (gfx->width() - textWidth) / 2;
+        gfx->setTextSize(textSize);
+        gfx->setCursor(x, y);
+        gfx->print(text);
     }
 
 };
