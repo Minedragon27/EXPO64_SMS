@@ -1,5 +1,5 @@
 #include <Arduino.h>
-//#include <hmi.h>
+#include <hmi.h>
 #include <Arduino_FreeRTOS.h>
 #include <CHT8305.h> //tempHum sensor
 
@@ -31,7 +31,7 @@ byte targetLight;
 //-----------------------------------------
 
 //functions ---------------------------------
-/*
+
 void UpdateTargetParameters()
 {
     byte buttons=hmi1.readButtons();
@@ -111,7 +111,7 @@ void UpdateTargetParameters()
         hmi1.writeToScreen(currentLight,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
-}*/
+}
 
 void getSensorData(void * parameters){
     for(;;){
