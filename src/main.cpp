@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <MHZ19.h>
 #include <hmi.h>
-#include "CHT8305.h"
+#include <CHT8305.h> 
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
@@ -10,39 +10,27 @@ CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
 
 //testing variables-------------------------
 short R[8]={5,6,7,8,9,10,11,12};
-int LED[4]={13,14,15,16};
-
-#define cs 10
-#define dc 9
-#define rst 8
-TFT TFTScreen = TFT(cs,dc,rst);
-HMI hmi1(1,2,3,4,R,LED,TFTScreen);
-MHZ19 sensorCO2(&Serial1);
-//to use: currentCO2=sensorCO2.getCO2(); can also use sensorCO2.getTemperature(); and senosrCO2.getAccuracy(); https://github.com/strange-v/MHZ19/blob/master/examples/hw_get_values/hw_get_values.ino
-
-float currentTemperature;
-float targetTemperature;
-float currentHumidity;
-float targetHumidity;
-float currentCO2;
-float targetCO2;
-float currentLight;
-float targetLight;
-
-// put function declarations here:
-int myFunction(int, int);
-void UpdateTargetParameters();
-void readCO2();
+int LED[4]={5,6,7,12};
 
 
-byte currentTemperature;
-byte targetTemperature;
-byte currentHumidity;
-byte targetHumidity;
-byte currentCO2;
-byte targetCO2;
-byte currentLight;
-byte targetLight;
+const short dataLen=8*60;//how many data snapshots are kept, 10000 min=1 week 200kB
+float dataLog[dataLen][5];//2d array to store the values
+unsigned long timeOfLastLog=0;
+short posData=0;//keeps track of which row of the array is the current one
+
+Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
+Arduino_GFX *gfx =new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */);//objects used for LCD screen
+
+HMI hmi1=HMI(1,2,3,4,R,LED,gfx);
+
+float currentTemperature=20;
+float targetTemperature=20;//default value
+float currentHumidity=20;
+float targetHumidity=20;
+int currentCO2=20;
+int targetCO2=20;
+float currentLight=20;
+float targetLight=20;
 //-----------------------------------------
 
 //functions ---------------------------------
@@ -127,7 +115,54 @@ void UpdateTargetParameters()
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
 }
-
+void LogData()
+{   
+    
+    unsigned long time=millis();//take the current time
+    if(timeOfLastLog>time) timeOfLastLog=0;//if millis() overflows, reset the timeOfLastLog as well
+    if(time-timeOfLastLog>1000*60)//check if 1 minute has passed since last call
+    {
+        timeOfLastLog=time;
+        if(posData==dataLen-1)//array has been filled and must be shifted
+        {
+            for(int i=0;i<dataLen-1;i++)//shifted moves all data snapshots down by 1 row in the array, skips the last one since it is overwritten later
+            {
+                dataLog[i][0]=dataLog[i+1][0];
+                dataLog[i][1]=dataLog[i+1][1];
+                dataLog[i][2]=dataLog[i+1][2];
+                dataLog[i][3]=dataLog[i+1][3];
+                dataLog[i][4]=dataLog[i+1][4];
+            }
+        }
+        else posData++;//else increment to next pos
+        dataLog[posData][0]=time/1000;//save current values to arrays, time is saved in seconds
+        dataLog[posData][1]=currentTemperature;
+        dataLog[posData][2]=currentHumidity;
+        dataLog[posData][3]=currentCO2;
+        dataLog[posData][4]=currentLight;
+    }
+}
+void dataOutput()
+{   
+    int incomingMessage=0;
+    if (Serial.available() == 0) return;//no message received
+    else
+    {
+        incomingMessage = Serial.read();
+    }
+    if(incomingMessage==int('p'))//trigger condition is receiving a 'p' on serial
+    {
+        for(int i=0;i<=posData;i++)
+        {
+            Serial.println("----------------");
+            Serial.println("Time: "+String(dataLog[i][0]));
+            Serial.println("Temperature: "+String(dataLog[i][1]));
+            Serial.println("Humidity: "+String(dataLog[i][2]));
+            Serial.println("CO2: "+String(dataLog[i][3]));
+            Serial.println("Light: "+String(dataLog[i][4]));
+        }
+    }
+}
 //----------------------------------------
 
 
@@ -135,14 +170,26 @@ void UpdateTargetParameters()
 
 void setup() {
   // setup for temp_hum sensor -----------
-  Serial.begin(115200);
+  Serial.begin(9600);
+  gfx->begin();//initialize screen
+  gfx->fillScreen(BLACK);
+  gfx->setTextColor(RGB565(150,150,150));
+  hmi1.drawText("test",2,50);
   Wire.begin();
   Wire.setClock(400000);
+  tempHumSensor.begin();
   //CHT.begin();
+
   // ---------------------------------------
+  
+  
 }   
 
 void loop() {
   // put your main code here, to run repeatedly:
+  hmi1.currentParameter=HMI::temperature;
+  currentTemperature=rand()%50;
+  hmi1.writeToScreen(currentTemperature,targetTemperature);
+  delay(5000);
 }
 
