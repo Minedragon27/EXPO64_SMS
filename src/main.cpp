@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <MHZ19.h>
 #include <hmi.h>
 #include <CHT8305.h> 
 
@@ -33,6 +34,7 @@ float targetLight=20;
 //-----------------------------------------
 
 //functions ---------------------------------
+
 void UpdateTargetParameters()
 {
     byte buttons=hmi1.readButtons();
@@ -165,6 +167,7 @@ void dataOutput()
 
 
 
+
 void setup() {
   // setup for temp_hum sensor -----------
   Serial.begin(9600);
@@ -175,6 +178,8 @@ void setup() {
   Wire.begin();
   Wire.setClock(400000);
   tempHumSensor.begin();
+  //CHT.begin();
+
   // ---------------------------------------
   
   
