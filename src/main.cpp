@@ -1,12 +1,21 @@
 #include <Arduino.h>
 #include <MHZ19.h>
 #include <hmi.h>
+#include "CHT8305.h"
 
+// objects --------------------------------
+CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
+//       use getHumidity() and getTemperature()
+//-----------------------------------------
 
-//testing variables
+//testing variables-------------------------
 short R[8]={5,6,7,8,9,10,11,12};
 int LED[4]={13,14,15,16};
-TFT TFTScreen;
+
+#define cs 10
+#define dc 9
+#define rst 8
+TFT TFTScreen = TFT(cs,dc,rst);
 HMI hmi1(1,2,3,4,R,LED,TFTScreen);
 MHZ19 sensorCO2(&Serial1);
 //to use: currentCO2=sensorCO2.getCO2(); can also use sensorCO2.getTemperature(); and senosrCO2.getAccuracy(); https://github.com/strange-v/MHZ19/blob/master/examples/hw_get_values/hw_get_values.ino
@@ -25,20 +34,19 @@ int myFunction(int, int);
 void UpdateTargetParameters();
 void readCO2();
 
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
-}
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+byte currentTemperature;
+byte targetTemperature;
+byte currentHumidity;
+byte targetHumidity;
+byte currentCO2;
+byte targetCO2;
+byte currentLight;
+byte targetLight;
+//-----------------------------------------
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+//functions ---------------------------------
 
-}
 void UpdateTargetParameters()
 {
     byte buttons=hmi1.readButtons();
@@ -118,6 +126,23 @@ void UpdateTargetParameters()
         hmi1.writeToScreen(currentLight,shownTarget);//show values
         if (hmi1.readBit(buttons,7)) return;//exit; does not save automatically
     }
+}
 
+//----------------------------------------
+
+
+
+
+void setup() {
+  // setup for temp_hum sensor -----------
+  Serial.begin(115200);
+  Wire.begin();
+  Wire.setClock(400000);
+  //CHT.begin();
+  // ---------------------------------------
+}   
+
+void loop() {
+  // put your main code here, to run repeatedly:
 }
 
