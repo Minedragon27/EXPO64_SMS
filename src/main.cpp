@@ -3,6 +3,7 @@
 #include <hmi.h>
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
+#include <semphr.h> // Required for mutexes and other semaphores?
 
 
 // objects --------------------------------
@@ -33,6 +34,9 @@ volatile float targetCO2 = 20;
 volatile float currentLight = 20; // what
 volatile float targetLight = 20;
 //-----------------------------------------
+
+// Mutex for protecting sensor data access
+SemaphoreHandle_t xSensorDataMutex;
 
 // functions ---------------------------------
 
@@ -204,6 +208,12 @@ void setup()
 {
     // general setup --------------------------------------------
     Serial.begin(9600);
+    xSensorDataMutex = xSemaphoreCreateMutex();
+    if (xSensorDataMutex == NULL)
+    {
+        Serial.println("Error: Failed to create sensor data mutex.");
+        // Handle error, maybe halt execution or retry
+    }
 
     // setup for screen -----------------------------------------
     gfx->begin(); // initialize screen
