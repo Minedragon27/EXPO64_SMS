@@ -53,15 +53,22 @@ void actuateTemperature(void *parameters)
     // parameter 1 of 4: temperature
     // actuator: peltier + 2 60x60x10 fans
     for (;;)
-    {
+    { if (currentHumidity != targetHumidity)
+        {
+            //PID controller here
+        }
     }
 }
+
 void actuateHumidity(void *parameters)
 {
     // parameter 2 of 4: humidity
     // actuator: mist disc
     for (;;)
-    {
+    { if (currentTemperature != targetTemperature)
+        {
+            //PID controller here
+        }
     }
 }
 
@@ -70,7 +77,11 @@ void actuateCO2(void *parameters)
     // parameter 3 of 4: CO2
     // actuator: 2 40x40x10 fans
     for (;;)
-    {
+    {if (currentCO2 != targetCO2)
+        {
+            //P controller here
+            // 
+        }
     }
 }
 
