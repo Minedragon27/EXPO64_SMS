@@ -24,14 +24,14 @@ Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* I
 
 HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
 
-float currentTemperature = 20;
-float targetTemperature = 20; // default value
-float currentHumidity = 20;
-float targetHumidity = 20;
-int currentCO2 = 20;
-int targetCO2 = 20;
-float currentLight = 20;
-float targetLight = 20;
+volatile float currentTemperature = 20;
+volatile float targetTemperature = 20; // default value
+volatile float currentHumidity = 20;
+volatile float targetHumidity = 20;
+volatile float currentCO2 = 20;
+volatile float targetCO2 = 20;
+volatile float currentLight = 20; // what
+volatile float targetLight = 20;
 //-----------------------------------------
 
 // functions ---------------------------------
@@ -190,8 +190,7 @@ void getSensorData(void *parameters)
         {
             currentHumidity = tempHumSensor.getHumidity();
             currentTemperature = tempHumSensor.getTemperature();
-            // currentCO2 ? idk how this is done yet
-            // currentLight? we dont have a sensor for this
+            // currentCO2 ?
 
             xSemaphoreGive(xSensorDataMutex); // Release the mutex after writing
         }
