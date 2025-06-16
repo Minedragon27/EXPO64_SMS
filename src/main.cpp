@@ -6,10 +6,10 @@
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-//       use getHumidity() and getTemperature()
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
 //-----------------------------------------
 
-// testing variables-------------------------
+// testing variables----------------------------------
 short R[8] = {5, 6, 7, 8, 9, 10, 11, 12};
 int LED[4] = {5, 6, 7, 12};
 
@@ -21,8 +21,8 @@ short posData = 0; // keeps track of which row of the array is the current one
 Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
 
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
 
+// global variables -----------------------------------
 volatile float currentTemperature = 20;
 volatile float targetTemperature = 20; // default value
 volatile float currentHumidity = 20;
