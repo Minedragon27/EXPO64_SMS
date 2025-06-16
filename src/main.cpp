@@ -13,15 +13,14 @@ const short dataLen = 8 * 60; // how many data snapshots are kept, 10000 min=1 w
 float dataLog[dataLen][5];    // 2d array to store the values
 unsigned long timeOfLastLog = 0;
 short posData = 0; // keeps track of which row of the array is the current one
+//-----------------------------------------------------
 
+// objects --------------------------------------------
+CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
 Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
 //-----------------------------------------------------
-
-// objects --------------------------------
-CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
-//-----------------------------------------
 
 // global variables -----------------------------------
 volatile float currentTemperature = 20;
@@ -32,20 +31,18 @@ volatile int currentCO2 = 20;
 volatile int targetCO2 = 20;
 volatile float currentLight = 20; // what
 volatile float targetLight = 20;
-//-----------------------------------------
+//-----------------------------------------------------
 
-// Mutex for protecting parameters data access
+// Mutex for protecting parameters data access --------
 SemaphoreHandle_t xSensorDataMutex;
 
-//tasks -------------------------------------
-
+// tasks and functions ---------------------------------
 
 void actuateAdjustments(){
     //actuator 1 of 4: LED-----------------------
     
     // LED --------------------------------------
 }
-
 
 void UpdateTargetParameters()
 {
@@ -139,7 +136,6 @@ void UpdateTargetParameters()
             return; // exit; does not save automatically
     }
 }
-
 void LogData()
 {
 
@@ -191,7 +187,6 @@ void dataOutput()
         }
     }
 }
-
 void getSensorData(void *parameters)
 {
     for (;;)
@@ -214,7 +209,7 @@ void getSensorData(void *parameters)
         vTaskDelay(1000 / portTICK_PERIOD_MS); // Update every 1 second
     }
 }
-//----------------------------------------
+//------------------------------------------------------
 
 void setup()
 {
@@ -257,4 +252,25 @@ void setup()
 
 void loop()
 {
+    /* THE SECRET MUSHROOM SOCIETY WILL LIVE FOREVER
+
+           ____
+        _.-'78o `"`--._
+    ,o888o.  .o888o,   ''-.
+  ,88888P  `78888P..______.]
+ /_..__..----""        __.'
+ `-._       /""| _..-''
+     "`-----\  `\
+             |   ;.-""--..
+             | ,8o.  o88. `.
+             `;888P  `788P  :
+       .o""-.|`-._         ./
+      J88 _.-/    ";"-P----'
+      `--'\`|     /  /
+          | /     |  |
+          \|     /   |akn
+           `-----`---'
+
+
+    */
 }
