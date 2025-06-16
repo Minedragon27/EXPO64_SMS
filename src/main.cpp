@@ -3,7 +3,8 @@
 #include <hmi.h>
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
-#include <semphr.h> // Required for mutexes and other semaphores?
+#include <lib/FreeRTOS-Kernel-v10.5.1/semphr.h>
+//#include <semphr.h> // Required for mutexes and other semaphores?
 
 
 // objects --------------------------------
@@ -231,7 +232,7 @@ void setup()
     xTaskCreate(
         getSensorData,
         "get tempHum sensor data",
-        1000, // stack size, no idea of real number
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
         NULL, // task parameters
         1,// task priority
         NULL // task handle
