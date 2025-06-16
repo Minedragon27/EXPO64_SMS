@@ -185,9 +185,18 @@ void getSensorData(void *parameters)
 {
     for (;;)
     {
-        //return tempHumSensor.getHumidity(), tempHumSensor.getTemperature();
+        // acquire the mutex before writing to shared variables
+        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
+        {
+            currentHumidity = tempHumSensor.getHumidity();
+            currentTemperature = tempHumSensor.getTemperature();
+            // currentCO2 ? idk how this is done yet
+            // currentLight? we dont have a sensor for this
 
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+            xSemaphoreGive(xSensorDataMutex); // Release the mutex after writing
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS); // Update every 1 second
     }
 }
 //----------------------------------------
@@ -225,7 +234,6 @@ void setup()
     //starts scheduler and never leaves it!
     vTaskStartScheduler();
     
-    // ---------------------------------------
 }
 
 void loop()
