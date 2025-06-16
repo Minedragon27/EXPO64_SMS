@@ -181,11 +181,11 @@ void dataOutput()
     }
 }
 
-float getSensorData(void *parameters)
+void getSensorData(void *parameters)
 {
     for (;;)
     {
-        return tempHumSensor.getHumidity(), tempHumSensor.getTemperature();
+        //return tempHumSensor.getHumidity(), tempHumSensor.getTemperature();
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
@@ -194,16 +194,33 @@ float getSensorData(void *parameters)
 
 void setup()
 {
-    // setup for temp_hum sensor -----------
+    // general setup --------------------------------------------
     Serial.begin(9600);
+
+    // setup for screen -----------------------------------------
     gfx->begin(); // initialize screen
     gfx->fillScreen(BLACK);
     gfx->setTextColor(RGB565(150, 150, 150));
     hmi1.drawText("test", 2, 50);
+
+    // setup for temp_hum sensor ---------------------------------
     Wire.begin();
     Wire.setClock(400000);
     tempHumSensor.begin();
-    // CHT.begin();
+
+    // all tasks creations ---------------------------------------
+
+    xTaskCreate(
+        getSensorData,
+        "get tempHum sensor data",
+        1000, // stack size, no idea of real number
+        NULL, // task parameters
+        1,// task priority
+        NULL // task handle
+    );
+
+    //end of tasks -----------------------------------------------
+
 
     //starts scheduler and never leaves it!
     vTaskStartScheduler();
