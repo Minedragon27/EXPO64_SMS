@@ -6,6 +6,7 @@
   the RGB LED on the Portenta C33 board.
 */
 
+
 /**************************************************************************************
  * INCLUDE
  **************************************************************************************/
@@ -54,6 +55,7 @@ void setup()
   Serial.begin(115200);
   while (!Serial) { }
 
+
 #if defined(ARDUINO_PORTENTA_C33)
   /* Only the Portenta C33 has an RGB LED. */
   pinMode(LEDR, OUTPUT);
@@ -94,7 +96,7 @@ void setup()
     );
 
   if (rc_blinky != pdPASS) {
-    Serial.println("Failed to create 'loop' thread");
+    Serial.println("Failed to create 'blinky' thread");
     return;
   }
 
