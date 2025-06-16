@@ -4,7 +4,6 @@
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
 
-
 // testing variables----------------------------------
 short R[8] = {5, 6, 7, 8, 9, 10, 11, 12};
 int LED[4] = {5, 6, 7, 12};
@@ -20,7 +19,7 @@ Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* I
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
 //-----------------------------------------
 
 // global variables -----------------------------------
@@ -36,7 +35,6 @@ volatile float targetLight = 20;
 
 // Mutex for protecting parameters data access
 SemaphoreHandle_t xSensorDataMutex;
-
 
 // functions ---------------------------------
 
@@ -192,8 +190,13 @@ void getSensorData(void *parameters)
         // acquire the mutex before writing to shared variables
         if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
         {
+            tempHumSensor.read();
             currentHumidity = tempHumSensor.getHumidity();
+            //Serial.print("humidity (%): ");
+            //Serial.println(tempHumSensor.getHumidity());
             currentTemperature = tempHumSensor.getTemperature();
+            //Serial.print("temperature (℃): ");
+            //Serial.println(currentTemperature);
             // currentCO2 ?
 
             xSemaphoreGive(xSensorDataMutex); // Release the mutex after writing
@@ -206,11 +209,9 @@ void getSensorData(void *parameters)
 
 void setup()
 {
-    xSensorDataMutex = xSemaphoreCreateMutex();
-    
     // general setup --------------------------------------------
-    Serial.begin(9600);
-
+    Serial.begin(115200);
+    xSensorDataMutex = xSemaphoreCreateMutex();
     if (xSensorDataMutex == NULL)
     {
         Serial.println("Error: Failed to create sensor data mutex.");
@@ -226,7 +227,7 @@ void setup()
     // setup for temp_hum sensor ---------------------------------
     Wire.begin();
     Wire.setClock(400000);
-    tempHumSensor.begin();  
+    tempHumSensor.begin();
 
     // all tasks creations ---------------------------------------
 
@@ -234,24 +235,17 @@ void setup()
         getSensorData,
         "get tempHum sensor data",
         configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
-        NULL, // task parameters
-        1,// task priority
-        NULL // task handle
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
     );
 
-    //end of tasks -----------------------------------------------
+    // end of tasks -----------------------------------------------
 
-
-    //starts scheduler and never leaves it!
+    // starts scheduler and never leaves it!
     vTaskStartScheduler();
-    
 }
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
-    hmi1.currentParameter = HMI::temperature;
-    currentTemperature = rand() % 50;
-    hmi1.writeToScreen(currentTemperature, targetTemperature);
-    delay(5000);
 }
