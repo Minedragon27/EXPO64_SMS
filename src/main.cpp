@@ -4,10 +4,6 @@
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
 
-// objects --------------------------------
-CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
-//-----------------------------------------
 
 // testing variables----------------------------------
 short R[8] = {5, 6, 7, 8, 9, 10, 11, 12};
@@ -20,7 +16,12 @@ short posData = 0; // keeps track of which row of the array is the current one
 
 Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
+//-----------------------------------------------------
 
+// objects --------------------------------
+CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
+//-----------------------------------------
 
 // global variables -----------------------------------
 volatile float currentTemperature = 20;
