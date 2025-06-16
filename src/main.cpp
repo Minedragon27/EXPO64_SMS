@@ -3,7 +3,6 @@
 #include <hmi.h>
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
-#include <lib/FreeRTOS-Kernel-v10.5.1/semphr.h>
 //#include <semphr.h> // Required for mutexes and other semaphores?
 
 
@@ -30,8 +29,8 @@ volatile float currentTemperature = 20;
 volatile float targetTemperature = 20; // default value
 volatile float currentHumidity = 20;
 volatile float targetHumidity = 20;
-volatile float currentCO2 = 20;
-volatile float targetCO2 = 20;
+volatile int currentCO2 = 20;
+volatile int targetCO2 = 20;
 volatile float currentLight = 20; // what
 volatile float targetLight = 20;
 //-----------------------------------------
