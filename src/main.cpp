@@ -15,11 +15,17 @@ unsigned long timeOfLastLog = 0;
 short posData = 0; // keeps track of which row of the array is the current one
 //-----------------------------------------------------
 
+// pins ----------------------------------------------
+const int LED_PIN = 6;// TODO: choose a real pin for LED
+//-----------------------------------------------------
+
+
 // objects --------------------------------------------
 CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
 HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
 Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
 //-----------------------------------------------------
 
 // global variables -----------------------------------
@@ -31,6 +37,9 @@ volatile int currentCO2 = 20;
 volatile int targetCO2 = 20;
 volatile float currentLight = 20; // what
 volatile float targetLight = 20;
+
+const int LED_COUNT = 60; //TODO : put number of LEDS in strip
+const int BRIGHTNESS = 50;
 //-----------------------------------------------------
 
 // Mutex for protecting parameters data access --------
@@ -38,21 +47,41 @@ SemaphoreHandle_t xSensorDataMutex;
 
 // tasks and functions ---------------------------------
 
-void actuateAdjustments(){
-    //parameter 1 of 4: light ---------------------------
-    //actuator: LED strip
-
-
-    //parameter 2 of 4: CO2 -----------------------------
-    //actuator: 2 40x40x10 fans
-  
-
-    //parameter 3 of 4: temperature --------------------
-    //actuator: peltier + 2 60x60x10 fans 
-
-    //parameter 4 of 4: humidity-------------------------
+void actuateTemperature(void *parameters){
+    //parameter 1 of 4: temperature
+    //actuator: peltier + 2 60x60x10 fans
+    for (;;)
+    {
+        if( currentLight != targetLight ){
+                        
+        }
+    }
+}
+void actuateHumidity(void *parameters){
+    //parameter 2 of 4: humidity
     //actuator: mist disc 
+    for (;;)
+    {
 
+    }
+}
+
+void actuateCO2(void *parameters){
+    //parameter 3 of 4: CO2
+    //actuator: 2 40x40x10 fans
+    for (;;)
+    {
+
+    }
+}
+
+void actuateLight(void *parameters){
+    //parameter 4 of 4: light
+    //actuator: LED strip
+    for (;;)
+    {
+
+    }
 }
 
 void UpdateTargetParameters()
@@ -243,6 +272,11 @@ void setup()
     Wire.begin();
     Wire.setClock(400000);
     tempHumSensor.begin();
+
+    // setup for LED strip ----------------------------------------
+    strip.begin();           // INITIALIZE NeoPixel strip object 
+    strip.show();            // Turn OFF all pixels ASAP
+    strip.setBrightness(BRIGHTNESS);
 
     // all tasks creations ---------------------------------------
 
