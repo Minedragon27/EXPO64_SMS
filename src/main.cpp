@@ -2,6 +2,8 @@
 #include <MHZ19.h>
 #include <hmi.h>
 #include <CHT8305.h>
+#include <Arduino_FreeRTOS.h>
+
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
