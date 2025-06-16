@@ -25,6 +25,7 @@ HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
 Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
+MHZ19 sensorCO2(&Serial1); //to use: currentCO2=sensorCO2.getCO2(); can also use sensorCO2.getTemperature(); and senosrCO2.getAccuracy(); https://github.com/strange-v/MHZ19/blob/master/examples/hw_get_values/hw_get_values.ino
 //-----------------------------------------------------
 
 // global variables -----------------------------------
