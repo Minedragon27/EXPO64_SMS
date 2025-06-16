@@ -39,9 +39,20 @@ SemaphoreHandle_t xSensorDataMutex;
 // tasks and functions ---------------------------------
 
 void actuateAdjustments(){
-    //actuator 1 of 4: LED-----------------------
-    
-    // LED --------------------------------------
+    //parameter 1 of 4: light ---------------------------
+    //actuator: LED strip
+
+
+    //parameter 2 of 4: CO2 -----------------------------
+    //actuator: 2 40x40x10 fans
+  
+
+    //parameter 3 of 4: temperature --------------------
+    //actuator: peltier + 2 60x60x10 fans 
+
+    //parameter 4 of 4: humidity-------------------------
+    //actuator: mist disc 
+
 }
 
 void UpdateTargetParameters()
