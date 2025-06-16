@@ -2,6 +2,7 @@
 #include <MHZ19.h>
 #include <hmi.h>
 #include <CHT8305.h> 
+#include <Adafruit_NeoPixel.h>
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40);   // temperature and humidity sensor
@@ -31,9 +32,16 @@ int currentCO2=20;
 int targetCO2=20;
 float currentLight=20;
 float targetLight=20;
-//-----------------------------------------
+//-----------------------------------------------
 
-//functions ---------------------------------
+//tasks -------------------------------------
+
+
+void actuateAdjustments(){
+    //actuator 1 of 4: LED-----------------------
+    Adafruit_NeoPixel
+    // LED --------------------------------------
+}
 
 void UpdateTargetParameters()
 {
@@ -117,7 +125,7 @@ void UpdateTargetParameters()
 }
 void LogData()
 {   
-    
+ 
     unsigned long time=millis();//take the current time
     if(timeOfLastLog>time) timeOfLastLog=0;//if millis() overflows, reset the timeOfLastLog as well
     if(time-timeOfLastLog>1000*60)//check if 1 minute has passed since last call
