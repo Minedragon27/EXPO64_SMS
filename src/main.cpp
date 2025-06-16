@@ -3,8 +3,6 @@
 #include <hmi.h>
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
-//#include <semphr.h> // Required for mutexes and other semaphores?
-
 
 // objects --------------------------------
 CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
@@ -35,8 +33,9 @@ volatile float currentLight = 20; // what
 volatile float targetLight = 20;
 //-----------------------------------------
 
-// Mutex for protecting sensor data access
+// Mutex for protecting parameters data access
 SemaphoreHandle_t xSensorDataMutex;
+
 
 // functions ---------------------------------
 
@@ -206,9 +205,11 @@ void getSensorData(void *parameters)
 
 void setup()
 {
+    xSensorDataMutex = xSemaphoreCreateMutex();
+    
     // general setup --------------------------------------------
     Serial.begin(9600);
-    xSensorDataMutex = xSemaphoreCreateMutex();
+
     if (xSensorDataMutex == NULL)
     {
         Serial.println("Error: Failed to create sensor data mutex.");
@@ -224,7 +225,7 @@ void setup()
     // setup for temp_hum sensor ---------------------------------
     Wire.begin();
     Wire.setClock(400000);
-    tempHumSensor.begin();
+    tempHumSensor.begin();  
 
     // all tasks creations ---------------------------------------
 
