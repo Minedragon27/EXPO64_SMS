@@ -3,5 +3,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-.arduino-renesas-bootloader/
+.arduino-renesas-bootloader
+.tinyusb
 
