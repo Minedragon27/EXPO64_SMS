@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <MHZ19.h>
 #include <hmi.h>
-#include <CHT8305.h> 
+#include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
 #include <Adafruit_NeoPixel.h>
 
@@ -16,13 +16,12 @@ short posData = 0; // keeps track of which row of the array is the current one
 //-----------------------------------------------------
 
 // pins ----------------------------------------------
-const int LED_PIN = 6;// TODO: choose a real pin for LED
+const int LED_PIN = 6; // TODO: choose a real pin for LED
 //-----------------------------------------------------
-
 
 // objects --------------------------------------------
 CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
 Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
@@ -35,11 +34,12 @@ volatile float currentHumidity = 20;
 volatile float targetHumidity = 20;
 volatile int currentCO2 = 20;
 volatile int targetCO2 = 20;
-volatile float currentLight = 20; // what
-volatile float targetLight = 20;
+volatile uint8_t currentLight = 20; // 0-255
+volatile uint8_t targetLight = 20;
 
-const int LED_COUNT = 60; //TODO : put number of LEDS in strip
+const int LED_COUNT = 60; // TODO : put number of LEDS in strip
 const int BRIGHTNESS = 50;
+const int FADE_DELAY_MS = 10;
 //-----------------------------------------------------
 
 // Mutex for protecting parameters data access --------
@@ -47,40 +47,69 @@ SemaphoreHandle_t xSensorDataMutex;
 
 // tasks and functions ---------------------------------
 
-void actuateTemperature(void *parameters){
-    //parameter 1 of 4: temperature
-    //actuator: peltier + 2 60x60x10 fans
+void actuateTemperature(void *parameters)
+{
+    // parameter 1 of 4: temperature
+    // actuator: peltier + 2 60x60x10 fans
     for (;;)
     {
-        if( currentLight != targetLight ){
-                        
+    }
+}
+void actuateHumidity(void *parameters)
+{
+    // parameter 2 of 4: humidity
+    // actuator: mist disc
+    for (;;)
+    {
+    }
+}
+
+void actuateCO2(void *parameters)
+{
+    // parameter 3 of 4: CO2
+    // actuator: 2 40x40x10 fans
+    for (;;)
+    {
+    }
+}
+
+void actuateLight(void *parameters)
+{
+    // parameter 4 of 4: light
+    // actuator: LED strip
+    for (;;)
+    {
+        if (currentLight != targetLight)
+        {
+            if (currentLight < targetLight)
+            {
+                // Brighten
+                for (int j = currentLight; j <= targetLight; j++)
+                {
+                    for (uint16_t i = 0; i < strip.numPixels(); i++)
+                    {
+                        strip.setPixelColor(i, j, j, j); // Set all channels to 'j' for grayscale
+                    }
+                    strip.show();
+                    vTaskDelay(pdMS_TO_TICKS(FADE_DELAY_MS));
+                    currentLight = j; // Update currentLight as we fade
+                }
+            }
+            else
+            {
+                // Darken
+                for (int j = currentLight; j >= targetLight; j--)
+                {
+                    for (uint16_t i = 0; i < strip.numPixels(); i++)
+                    {
+                        strip.setPixelColor(i, j, j, j); // Set all channels to 'j' for grayscale
+                    }
+                    strip.show();
+                    vTaskDelay(pdMS_TO_TICKS(FADE_DELAY_MS));
+                    currentLight = j; // Update currentLight as we fade
+                }
+            }
         }
-    }
-}
-void actuateHumidity(void *parameters){
-    //parameter 2 of 4: humidity
-    //actuator: mist disc 
-    for (;;)
-    {
-
-    }
-}
-
-void actuateCO2(void *parameters){
-    //parameter 3 of 4: CO2
-    //actuator: 2 40x40x10 fans
-    for (;;)
-    {
-
-    }
-}
-
-void actuateLight(void *parameters){
-    //parameter 4 of 4: light
-    //actuator: LED strip
-    for (;;)
-    {
-
     }
 }
 
@@ -236,12 +265,12 @@ void getSensorData(void *parameters)
         {
             tempHumSensor.read();
             currentHumidity = tempHumSensor.getHumidity();
-            //Serial.print("humidity (%): ");
-            //Serial.println(tempHumSensor.getHumidity());
+            // Serial.print("humidity (%): ");
+            // Serial.println(tempHumSensor.getHumidity());
             currentTemperature = tempHumSensor.getTemperature();
-            //Serial.print("temperature (℃): ");
-            //Serial.println(currentTemperature);
-            // currentCO2 ?
+            // Serial.print("temperature (℃): ");
+            // Serial.println(currentTemperature);
+            //  currentCO2 ?
 
             xSemaphoreGive(xSensorDataMutex); // Release the mutex after writing
         }
@@ -274,8 +303,8 @@ void setup()
     tempHumSensor.begin();
 
     // setup for LED strip ----------------------------------------
-    strip.begin();           // INITIALIZE NeoPixel strip object 
-    strip.show();            // Turn OFF all pixels ASAP
+    strip.begin(); // INITIALIZE NeoPixel strip object
+    strip.show();  // Turn OFF all pixels ASAP
     strip.setBrightness(BRIGHTNESS);
 
     // all tasks creations ---------------------------------------
