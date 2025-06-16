@@ -181,10 +181,11 @@ void dataOutput()
     }
 }
 
-void getSensorData(void *parameters)
+float getSensorData(void *parameters)
 {
     for (;;)
     {
+        return tempHumSensor.getHumidity(), tempHumSensor.getTemperature();
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
@@ -204,6 +205,9 @@ void setup()
     tempHumSensor.begin();
     // CHT.begin();
 
+    //starts scheduler and never leaves it!
+    vTaskStartScheduler();
+    
     // ---------------------------------------
 }
 
