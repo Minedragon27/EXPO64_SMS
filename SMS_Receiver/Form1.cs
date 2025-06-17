@@ -29,9 +29,7 @@ namespace SMS_Receiver
         */
         static RadioButton[] radioButtonsPorts;
         Thread readThread;
-        Thread writeThread;
         bool enableReading = false;
-        bool continueWriting = false;
         List<float[]> dataLogCache=new List<float[]>();
         public Form1()
         {
@@ -142,13 +140,12 @@ namespace SMS_Receiver
         private void buttonDisconnect_Click(object sender, EventArgs e)
         {
             enableReading = false;
-            continueWriting = false;
+            
 
             // Wait for threads to stop gracefully
             if (readThread != null && readThread.IsAlive)
                 readThread.Join();
-            if (writeThread != null && writeThread.IsAlive)
-                writeThread.Join();
+            
 
             if (serialPort.IsOpen)
                 serialPort.Close();
@@ -165,13 +162,13 @@ namespace SMS_Receiver
                 try
                 {
                     if (serialPort.BytesToRead == 0) continue;
-                    
+
                     string message = serialPort.ReadLine();
                     labelStatus.Invoke((MethodInvoker)(() => labelStatus.Text = "Received a Message"));
                     labelStatus.Invoke((MethodInvoker)(() => labelStatus.ForeColor = Color.Blue));
                     if (message == "transmitting")
                     {
-                        continueWriting = false;//stop requesting data
+
 
                         List<float[]> receivedData = new List<float[]>();
                         labelStatus.Invoke((MethodInvoker)(() => labelStatus.Text = "Receiving Data"));
@@ -181,7 +178,7 @@ namespace SMS_Receiver
                             float[] currLine = new float[5];
                             for (int i = 0; i < 5; i++) //reads each of the 5 values
                             {
-                                
+
                                 while (serialPort.BytesToRead == 0) ;
                                 message = serialPort.ReadLine();
                                 if (message == "end_transmission") break;
@@ -190,7 +187,7 @@ namespace SMS_Receiver
                             }//do for each row
                             if (message == "end_transmission") break;
                             while (serialPort.BytesToRead == 0) ;
-                            message =serialPort.ReadLine();//skip separator row
+                            message = serialPort.ReadLine();//skip separator row
                             receivedData.Add(currLine);//appends array to list
                             buttonDataOutput.Invoke((MethodInvoker)(() => buttonDataOutput.Enabled = true)); // disable
 
@@ -199,31 +196,34 @@ namespace SMS_Receiver
                         labelStatus.Invoke((MethodInvoker)(() => labelStatus.Text = "Data received"));
                         labelStatus.Invoke((MethodInvoker)(() => labelStatus.ForeColor = Color.Green));
                         enableReading = false;
-                        continueWriting = false;
+
                         dataLogCache = receivedData;
 
                     }
                 }
-                catch (TimeoutException) 
+                catch (TimeoutException)
                 {
                     labelStatus.Invoke((MethodInvoker)(() => labelStatus.Text = "Error"));
                     labelStatus.Invoke((MethodInvoker)(() => labelStatus.ForeColor = Color.Red));
                     MessageBox.Show("Timeout error");
                 }
+                catch (IOException)
+                {
+                    labelStatus.Invoke((MethodInvoker)(() => labelStatus.Text = "Error"));
+                    labelStatus.Invoke((MethodInvoker)(() => labelStatus.ForeColor = Color.Red));
+                    MessageBox.Show("Port Error");
+                }
             }
         }
-        public void Write()
-        {
-            
-        }
+
         private void buttonSendRequest_Click(object sender, EventArgs e)
         {
-             
-            continueWriting = true;
-            if (readThread==null)
+
+            enableReading = true;
+            if (readThread== null || !readThread.IsAlive)
             {
                 readThread = new Thread(Read);
-                if(!readThread.IsAlive)readThread.Start();
+                if(!readThread.IsAlive) readThread.Start();
             }
 
             buttonDataOutput.Enabled = true;
@@ -261,8 +261,7 @@ namespace SMS_Receiver
                         writer.WriteLine(line);
                     }
                 }
-                dataLogCache = new List<float[]>();
-                buttonDataOutput.Enabled = false;
+                
             }
             catch (IOException)
             {
