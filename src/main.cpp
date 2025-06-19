@@ -22,14 +22,14 @@ const int LED_PIN = 6; // TODO: choose a real pin for LED
 
 // objects --------------------------------------------
 CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx); 
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
 Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
-MHZ19 CO2sensor(&Serial1); 
-PIDcontroller tempController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); //TODO: find the constants and setpoint
-PIDcontroller humidityController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); //TODO: find the constants and setpoint
-PIDcontroller co2Controller(2.0, 0, 0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); //TODO: find kp  and set point. ki and kd are zero
+MHZ19 CO2sensor(&Serial1);
+PIDcontroller tempController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);     // TODO: find the constants and setpoint
+PIDcontroller humidityController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); // TODO: find the constants and setpoint
+PIDcontroller co2Controller(2.0, 0, 0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);          // TODO: find kp  and set point. ki and kd are zero
 //-----------------------------------------------------
 
 // global variables -----------------------------------
@@ -57,9 +57,10 @@ void actuateTemperature(void *parameters)
     // parameter 1 of 4: temperature
     // actuator: peltier + 2 60x60x10 fans
     for (;;)
-    { if (currentHumidity != targetHumidity)
+    {
+        if (currentHumidity != targetHumidity)
         {
-            //PID controller here
+            // PID controller here
         }
     }
 }
@@ -69,9 +70,10 @@ void actuateHumidity(void *parameters)
     // parameter 2 of 4: humidity
     // actuator: mist disc
     for (;;)
-    { if (currentTemperature != targetTemperature)
+    {
+        if (currentTemperature != targetTemperature)
         {
-            //PID controller here
+            // PID controller here
         }
     }
 }
@@ -81,10 +83,11 @@ void actuateCO2(void *parameters)
     // parameter 3 of 4: CO2
     // actuator: 2 40x40x10 fans
     for (;;)
-    {if (currentCO2 != targetCO2)
+    {
+        if (currentCO2 != targetCO2)
         {
-            //P controller here
-            // 
+            // P controller here
+            //
         }
     }
 }
@@ -129,146 +132,154 @@ void actuateLight(void *parameters)
     }
 }
 
-void UpdateTargetParameters()
+void UpdateTargetParameters(void *parameters)
 {
-    byte buttons = hmi1.readButtons();
-    bool firstLoopIteration = true; // used by loops to check if they have just started
-    float shownTarget = 0;          // initialize shownTarget variable, changed when rotating the knob
-
-    float scalingTemperature = 0.5; // how much should it change per step of the knob
-    float scalingHumidity = 0.5;
-    float scalingCO2 = 0.5;
-    float scalingLight = 0.5;
-
-    bool knobA, knobB = 0; // created just to find the current state
-    hmi1.readRotaryEncoder(&knobA, &knobB);
-    byte encState = 2 * knobA + knobB; // 0: 00; 1: 01; 2: 10; 3: 11; S: AB
-
-    while (hmi1.readBit(buttons, 0)) // go to temperature menu
+    for (;;)
     {
-        if (firstLoopIteration)
-        {
-            shownTarget = targetTemperature;
-            firstLoopIteration = false;
-        }
+        byte buttons = hmi1.readButtons();
+        bool firstLoopIteration = true; // used by loops to check if they have just started
+        float shownTarget = 0;          // initialize shownTarget variable, changed when rotating the knob
 
-        byte increment = hmi1.incrementRotation(&encState);
-        shownTarget = increment * scalingTemperature;
-        buttons = hmi1.readButtons();
-        if (hmi1.readBit(buttons, 6))
-            targetTemperature = shownTarget; // confirm target value
-        if (hmi1.readBit(buttons, 5))
-            shownTarget = targetTemperature;                 // reset target value
-        hmi1.writeToScreen(currentTemperature, shownTarget); // show values
-        if (hmi1.readBit(buttons, 7))
-            return; // exit; does not save automatically
-    }
-    while (hmi1.readBit(buttons, 1)) // go to humidity menu
-    {
-        if (firstLoopIteration)
-        {
-            shownTarget = targetHumidity;
-            firstLoopIteration = false;
-        }
+        float scalingTemperature = 0.5; // how much should it change per step of the knob
+        float scalingHumidity = 0.5;
+        float scalingCO2 = 0.5;
+        float scalingLight = 0.5;
 
-        byte increment = hmi1.incrementRotation(&encState);
-        shownTarget = increment * scalingHumidity;
-        buttons = hmi1.readButtons();
-        if (hmi1.readBit(buttons, 6))
-            targetHumidity = shownTarget; // confirm target value
-        if (hmi1.readBit(buttons, 5))
-            shownTarget = targetHumidity;                 // reset target value
-        hmi1.writeToScreen(currentHumidity, shownTarget); // show values
-        if (hmi1.readBit(buttons, 7))
-            return; // exit; does not save automatically;
-    }
-    while (hmi1.readBit(buttons, 2)) // go to CO2 menu
-    {
-        if (firstLoopIteration)
-        {
-            shownTarget = targetCO2;
-            firstLoopIteration = false;
-        }
+        bool knobA, knobB = 0; // created just to find the current state
+        hmi1.readRotaryEncoder(&knobA, &knobB);
+        byte encState = 2 * knobA + knobB; // 0: 00; 1: 01; 2: 10; 3: 11; S: AB
 
-        byte increment = hmi1.incrementRotation(&encState);
-        shownTarget = increment * scalingCO2;
-        buttons = hmi1.readButtons();
-        if (hmi1.readBit(buttons, 6))
-            targetCO2 = shownTarget; // confirm target value
-        if (hmi1.readBit(buttons, 5))
-            shownTarget = targetCO2;                 // reset target value
-        hmi1.writeToScreen(currentCO2, shownTarget); // show values
-        if (hmi1.readBit(buttons, 7))
-            return; // exit; does not save automatically
-    }
-    while (hmi1.readBit(buttons, 3)) // go to light menu
-    {
-        if (firstLoopIteration)
+        while (hmi1.readBit(buttons, 0)) // go to temperature menu
         {
-            shownTarget = targetLight;
-            firstLoopIteration = false;
-        }
-
-        byte increment = hmi1.incrementRotation(&encState);
-        shownTarget = increment * scalingLight;
-        buttons = hmi1.readButtons();
-        if (hmi1.readBit(buttons, 6))
-            targetLight = shownTarget; // confirm target value
-        if (hmi1.readBit(buttons, 5))
-            shownTarget = targetLight;                 // reset target value
-        hmi1.writeToScreen(currentLight, shownTarget); // show values
-        if (hmi1.readBit(buttons, 7))
-            return; // exit; does not save automatically
-    }
-}
-void LogData()
-{
-
-    unsigned long time = millis(); // take the current time
-    if (timeOfLastLog > time)
-        timeOfLastLog = 0;                // if millis() overflows, reset the timeOfLastLog as well
-    if (time - timeOfLastLog > 1000 * 60) // check if 1 minute has passed since last call
-    {
-        timeOfLastLog = time;
-        if (posData == dataLen - 1) // array has been filled and must be shifted
-        {
-            for (int i = 0; i < dataLen - 1; i++) // shifted moves all data snapshots down by 1 row in the array, skips the last one since it is overwritten later
+            if (firstLoopIteration)
             {
-                dataLog[i][0] = dataLog[i + 1][0];
-                dataLog[i][1] = dataLog[i + 1][1];
-                dataLog[i][2] = dataLog[i + 1][2];
-                dataLog[i][3] = dataLog[i + 1][3];
-                dataLog[i][4] = dataLog[i + 1][4];
+                shownTarget = targetTemperature;
+                firstLoopIteration = false;
             }
+
+            byte increment = hmi1.incrementRotation(&encState);
+            shownTarget = increment * scalingTemperature;
+            buttons = hmi1.readButtons();
+            if (hmi1.readBit(buttons, 6))
+                targetTemperature = shownTarget; // confirm target value
+            if (hmi1.readBit(buttons, 5))
+                shownTarget = targetTemperature;                 // reset target value
+            hmi1.writeToScreen(currentTemperature, shownTarget); // show values
+            if (hmi1.readBit(buttons, 7))
+                return; // exit; does not save automatically
         }
-        else
-            posData++;                     // else increment to next pos
-        dataLog[posData][0] = time / 1000; // save current values to arrays, time is saved in seconds
-        dataLog[posData][1] = currentTemperature;
-        dataLog[posData][2] = currentHumidity;
-        dataLog[posData][3] = currentCO2;
-        dataLog[posData][4] = currentLight;
+        while (hmi1.readBit(buttons, 1)) // go to humidity menu
+        {
+            if (firstLoopIteration)
+            {
+                shownTarget = targetHumidity;
+                firstLoopIteration = false;
+            }
+
+            byte increment = hmi1.incrementRotation(&encState);
+            shownTarget = increment * scalingHumidity;
+            buttons = hmi1.readButtons();
+            if (hmi1.readBit(buttons, 6))
+                targetHumidity = shownTarget; // confirm target value
+            if (hmi1.readBit(buttons, 5))
+                shownTarget = targetHumidity;                 // reset target value
+            hmi1.writeToScreen(currentHumidity, shownTarget); // show values
+            if (hmi1.readBit(buttons, 7))
+                return; // exit; does not save automatically;
+        }
+        while (hmi1.readBit(buttons, 2)) // go to CO2 menu
+        {
+            if (firstLoopIteration)
+            {
+                shownTarget = targetCO2;
+                firstLoopIteration = false;
+            }
+
+            byte increment = hmi1.incrementRotation(&encState);
+            shownTarget = increment * scalingCO2;
+            buttons = hmi1.readButtons();
+            if (hmi1.readBit(buttons, 6))
+                targetCO2 = shownTarget; // confirm target value
+            if (hmi1.readBit(buttons, 5))
+                shownTarget = targetCO2;                 // reset target value
+            hmi1.writeToScreen(currentCO2, shownTarget); // show values
+            if (hmi1.readBit(buttons, 7))
+                return; // exit; does not save automatically
+        }
+        while (hmi1.readBit(buttons, 3)) // go to light menu
+        {
+            if (firstLoopIteration)
+            {
+                shownTarget = targetLight;
+                firstLoopIteration = false;
+            }
+
+            byte increment = hmi1.incrementRotation(&encState);
+            shownTarget = increment * scalingLight;
+            buttons = hmi1.readButtons();
+            if (hmi1.readBit(buttons, 6))
+                targetLight = shownTarget; // confirm target value
+            if (hmi1.readBit(buttons, 5))
+                shownTarget = targetLight;                 // reset target value
+            hmi1.writeToScreen(currentLight, shownTarget); // show values
+            if (hmi1.readBit(buttons, 7))
+                return; // exit; does not save automatically
+        }
     }
 }
-void dataOutput()
+void LogData(void *parameters)
 {
-    int incomingMessage = 0;
-    if (Serial.available() == 0)
-        return; // no message received
-    else
+    for (;;)
     {
-        incomingMessage = Serial.read();
-    }
-    if (incomingMessage == int('p')) // trigger condition is receiving a 'p' on serial
-    {
-        for (int i = 0; i <= posData; i++)
+        unsigned long time = millis(); // take the current time
+        if (timeOfLastLog > time)
+            timeOfLastLog = 0;                // if millis() overflows, reset the timeOfLastLog as well
+        if (time - timeOfLastLog > 1000 * 60) // check if 1 minute has passed since last call
         {
-            Serial.println("----------------");
-            Serial.println("Time: " + String(dataLog[i][0]));
-            Serial.println("Temperature: " + String(dataLog[i][1]));
-            Serial.println("Humidity: " + String(dataLog[i][2]));
-            Serial.println("CO2: " + String(dataLog[i][3]));
-            Serial.println("Light: " + String(dataLog[i][4]));
+            timeOfLastLog = time;
+            if (posData == dataLen - 1) // array has been filled and must be shifted
+            {
+                for (int i = 0; i < dataLen - 1; i++) // shifted moves all data snapshots down by 1 row in the array, skips the last one since it is overwritten later
+                {
+                    dataLog[i][0] = dataLog[i + 1][0];
+                    dataLog[i][1] = dataLog[i + 1][1];
+                    dataLog[i][2] = dataLog[i + 1][2];
+                    dataLog[i][3] = dataLog[i + 1][3];
+                    dataLog[i][4] = dataLog[i + 1][4];
+                }
+            }
+            else
+                posData++;                     // else increment to next pos
+            dataLog[posData][0] = time / 1000; // save current values to arrays, time is saved in seconds
+            dataLog[posData][1] = currentTemperature;
+            dataLog[posData][2] = currentHumidity;
+            dataLog[posData][3] = currentCO2;
+            dataLog[posData][4] = currentLight;
+        }
+    }
+}
+void dataOutput(void *parameters)
+{
+    for (;;)
+    {
+        int incomingMessage = 0;
+        if (Serial.available() == 0)
+            return; // no message received
+        else
+        {
+            incomingMessage = Serial.read();
+        }
+        if (incomingMessage == int('p')) // trigger condition is receiving a 'p' on serial
+        {
+            for (int i = 0; i <= posData; i++)
+            {
+                Serial.println("----------------");
+                Serial.println("Time: " + String(dataLog[i][0]));
+                Serial.println("Temperature: " + String(dataLog[i][1]));
+                Serial.println("Humidity: " + String(dataLog[i][2]));
+                Serial.println("CO2: " + String(dataLog[i][3]));
+                Serial.println("Light: " + String(dataLog[i][4]));
+            }
         }
     }
 }
@@ -287,7 +298,7 @@ void getSensorData(void *parameters)
             // Serial.print("temperature (℃): ");
             // Serial.println(currentTemperature);
             //  currentCO2 ?
-            currentCO2 =CO2sensor.getCO2();
+            currentCO2 = CO2sensor.getCO2();
             // sensorCO2.getTemperature(); //if we want redundacy
             // sensorCO2.getAccuracy(); //if we want redundacy
 
@@ -331,6 +342,66 @@ void setup()
     xTaskCreate(
         getSensorData,
         "get tempHum sensor data",
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
+    );
+
+    xTaskCreate(
+        UpdateTargetParameters,
+        "updates the target parameners accordingly to user input",
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
+    );
+
+    xTaskCreate(
+        LogData,
+        "Logs parameters data for up to 8h",
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
+    );
+
+    xTaskCreate(
+        dataOutput,
+        "Outputs the data on serial upon user request",
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
+    );
+
+    xTaskCreate(
+        actuateTemperature,
+        "Actuates the peltier element + fans with PID control",
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
+    );
+    xTaskCreate(
+        actuateHumidity,
+        "Actuates mist disk with PID control",
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
+    );
+    xTaskCreate(
+        actuateCO2,
+        "Actuates fans with P control",
+        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        NULL,                     // task parameters
+        1,                        // task priority
+        NULL                      // task handle
+    );
+    xTaskCreate(
+        actuateLight,
+        "Turns on the LEDs.",
         configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
