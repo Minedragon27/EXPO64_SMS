@@ -61,6 +61,7 @@ void actuateTemperature(void *parameters)
         if (currentHumidity != targetHumidity)
         {
             // PID controller here
+            // to finish in a diferent branch?
         }
     }
 }
