@@ -4,6 +4,7 @@
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
 #include <Adafruit_NeoPixel.h>
+#include ".PIDcontroller.h"
 
 // testing variables----------------------------------
 short R[8] = {5, 6, 7, 8, 9, 10, 11, 12};
@@ -26,6 +27,9 @@ Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
 Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
 MHZ19 CO2sensor(&Serial1); 
+PIDcontroller tempController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); //TODO: find the constants and setpoint
+PIDcontroller humidityController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); //TODO: find the constants and setpoint
+PIDcontroller co2Controller(2.0, 0, 0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); //TODO: find kp  and set point. ki and kd are zero
 //-----------------------------------------------------
 
 // global variables -----------------------------------
