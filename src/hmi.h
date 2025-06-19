@@ -185,6 +185,7 @@ class HMI
     }
     void drawText( const String &text, int textSize, int y) //draws horizontally centered text
     {
+        
         int textWidth = text.length() * 6 * textSize; // approx. width per character
         int x = (gfx->width() - textWidth) / 2;
         gfx->setTextSize(textSize);

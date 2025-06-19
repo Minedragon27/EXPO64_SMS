@@ -159,49 +159,86 @@ void LogData()
         dataLog[posData][4] = currentLight;
     }
 }
-void dataOutput()
-{
-    int incomingMessage = 0;
-    if (Serial.available() == 0)
-        return; // no message received
+
+void DataOutput()
+{   
+    int incomingMessage=0;
+    if (Serial.available() == 0) return;//no message received
+  
     else
     {
         incomingMessage = Serial.read();
     }
     if (incomingMessage == int('p')) // trigger condition is receiving a 'p' on serial
     {
-        for (int i = 0; i <= posData; i++)
+        gfx->fillScreen(BLACK);
+        hmi1.drawText("Transmitting",2,50);
+        Serial.println("transmitting");
+        for(int i=0;i<=posData;i++)
         {
-            Serial.println("----------------");
-            Serial.println("Time: " + String(dataLog[i][0]));
-            Serial.println("Temperature: " + String(dataLog[i][1]));
-            Serial.println("Humidity: " + String(dataLog[i][2]));
-            Serial.println("CO2: " + String(dataLog[i][3]));
-            Serial.println("Light: " + String(dataLog[i][4]));
+            
+            Serial.println("Time: "+String(dataLog[i][0]));
+            Serial.println("Temperature: "+String(dataLog[i][1]));
+            Serial.println("Humidity: "+String(dataLog[i][2]));
+            Serial.println("CO2: "+String(dataLog[i][3]));
+            Serial.println("Light: "+String(dataLog[i][4]));
+            Serial.println("end line");
         }
+        Serial.println("end_transmission");
     }
 }
-void getSensorData(void *parameters)
-{
-    for (;;)
+//----------------------------------------
+
+
+
+
+void setup() {
+    // setup for temp_hum sensor -----------
+    Serial.begin(115200);
+    gfx->begin();//initialize screen
+    gfx->fillScreen(BLACK);
+    gfx->setTextColor(RGB565(150,150,150));
+    hmi1.drawText("test",2,50);
+    Wire.begin();
+    Wire.setClock(400000);
+    tempHumSensor.begin();
+    //CHT.begin();
+    for(int i=0;i<dataLen;i++)
     {
-        // acquire the mutex before writing to shared variables
-        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
-        {
-            tempHumSensor.read();
-            currentHumidity = tempHumSensor.getHumidity();
-            //Serial.print("humidity (%): ");
-            //Serial.println(tempHumSensor.getHumidity());
-            currentTemperature = tempHumSensor.getTemperature();
-            //Serial.print("temperature (℃): ");
-            //Serial.println(currentTemperature);
-            // currentCO2 ?
-
-            xSemaphoreGive(xSensorDataMutex); // Release the mutex after writing
-        }
-
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // Update every 1 second
+        dataLog[i][0]=i*1000;
+        dataLog[i][1]=rand()%50+rand()%100/100.0;
+        dataLog[i][2]=rand()%100+rand()%100/100.0;
+        dataLog[i][3]=rand()%900+100;
+        dataLog[i][4]=rand()%256;
+        posData=i;
     }
+  // ---------------------------------------
+  
+  
+}   
+
+void loop() {
+    // put your main code here, to run repeatedly:
+    hmi1.currentParameter=HMI::temperature;
+    currentTemperature=rand()%50;
+    hmi1.writeToScreen(currentTemperature,targetTemperature);
+    //LogData();
+    DataOutput();
+
+
+    
+    /*if(Serial.available()>0)
+    {
+        int message=Serial.read();
+        gfx->fillScreen(BLACK);
+        hmi1.drawText(String(message),2,50);//print received message
+        if(message==112) Serial.println(currentTemperature);
+    }*/
+
+
+
+    delay(5);
+
 }
 //------------------------------------------------------
 
