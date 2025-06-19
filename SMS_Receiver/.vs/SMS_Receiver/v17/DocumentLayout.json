@@ -3,7 +3,7 @@
   "WorkspaceRootPath": "C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{669C4371-67A4-4AEB-8350-17E8C81F5535}|SMS_Receiver.csproj|C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{669C4371-67A4-4AEB-8350-17E8C81F5535}|SMS_Receiver.csproj|c:\\users\\ivan ivanov\\desktop\\university\\expo mushroom\\software stuff\\code\\expo64_sms\\sms_receiver\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{669C4371-67A4-4AEB-8350-17E8C81F5535}|SMS_Receiver.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -16,9 +16,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{669C4371-67A4-4AEB-8350-17E8C81F5535}|SMS_Receiver.csproj|C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{669C4371-67A4-4AEB-8350-17E8C81F5535}|SMS_Receiver.csproj|solutionrelative:Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{669C4371-67A4-4AEB-8350-17E8C81F5535}|SMS_Receiver.csproj|c:\\users\\ivan ivanov\\desktop\\university\\expo mushroom\\software stuff\\code\\expo64_sms\\sms_receiver\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|5e9a8ac2-4f34-4521-858f-4c248ba31532"
     }
   ],
   "DocumentGroupContainers": [
@@ -39,8 +36,7 @@
               "ToolTip": "C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\SMS_Receiver.csproj",
               "RelativeToolTip": "SMS_Receiver.csproj",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-06-16T19:16:14.863Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-16T19:16:14.863Z"
             },
             {
               "$type": "Document",
@@ -50,22 +46,10 @@
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\Form1.cs",
               "RelativeToolTip": "Form1.cs",
-              "ViewState": "AgIAAJEAAAAAAAAAAAAUwJYAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAJYAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-16T08:56:12.955Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Form1.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\Form1.cs",
-              "RelativeDocumentMoniker": "Form1.cs",
-              "ToolTip": "C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\Form1.cs [Design]",
-              "RelativeToolTip": "Form1.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T08:43:59.851Z",
-              "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
@@ -78,6 +62,18 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-16T08:44:14.68Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "C:\\Users\\Ivan Ivanov\\Desktop\\University\\EXPO mushroom\\Software stuff\\Code\\EXPO64_SMS\\SMS_Receiver\\Form1.cs [Design]",
+              "RelativeToolTip": "Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-16T08:43:59.851Z",
+              "EditorCaption": " [Design]"
             }
           ]
         }
