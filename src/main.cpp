@@ -133,6 +133,31 @@ void actuateLight(void *parameters)
     }
 }
 
+void getSensorData(void *parameters)
+{
+    for (;;)
+    {
+        // acquire the mutex before writing to shared variables
+        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
+        {
+            tempHumSensor.read();
+            currentHumidity = tempHumSensor.getHumidity();
+            // Serial.print("humidity (%): ");
+            // Serial.println(tempHumSensor.getHumidity());
+            currentTemperature = tempHumSensor.getTemperature();
+            // Serial.print("temperature (℃): ");
+            // Serial.println(currentTemperature);
+            //  currentCO2 ?
+            currentCO2 = CO2sensor.getCO2();
+            // sensorCO2.getTemperature(); //if we want redundacy
+            // sensorCO2.getAccuracy(); //if we want redundacy
+
+            xSemaphoreGive(xSensorDataMutex); // Release the mutex after writing
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS); // Update every 1 second
+    }
+}
 void UpdateTargetParameters(void *parameters)
 {
     for (;;)
@@ -272,6 +297,9 @@ void dataOutput(void *parameters)
         }
         if (incomingMessage == int('p')) // trigger condition is receiving a 'p' on serial
         {
+            gfx->fillScreen(BLACK);
+            hmi1.drawText("Transmitting", 2, 50);
+            Serial.println("transmitting");
             for (int i = 0; i <= posData; i++)
             {
                 Serial.println("----------------");
@@ -282,34 +310,11 @@ void dataOutput(void *parameters)
                 Serial.println("Light: " + String(dataLog[i][4]));
             }
         }
+        Serial.println("end_transmission");
     }
 }
-void getSensorData(void *parameters)
-{
-    for (;;)
-    {
-        // acquire the mutex before writing to shared variables
-        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
-        {
-            tempHumSensor.read();
-            currentHumidity = tempHumSensor.getHumidity();
-            // Serial.print("humidity (%): ");
-            // Serial.println(tempHumSensor.getHumidity());
-            currentTemperature = tempHumSensor.getTemperature();
-            // Serial.print("temperature (℃): ");
-            // Serial.println(currentTemperature);
-            //  currentCO2 ?
-            currentCO2 = CO2sensor.getCO2();
-            // sensorCO2.getTemperature(); //if we want redundacy
-            // sensorCO2.getAccuracy(); //if we want redundacy
+//----------------------------------------
 
-            xSemaphoreGive(xSensorDataMutex); // Release the mutex after writing
-        }
-
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // Update every 1 second
-    }
-}
-//------------------------------------------------------
 
 void setup()
 {
@@ -321,23 +326,35 @@ void setup()
         Serial.println("Error: Failed to create sensor data mutex.");
         // Handle error, maybe halt execution or retry
     }
+    hmi1.drawText("test", 2, 50);
 
+    
     // setup for screen -----------------------------------------
     gfx->begin(); // initialize screen
     gfx->fillScreen(BLACK);
     gfx->setTextColor(RGB565(150, 150, 150));
     hmi1.drawText("test", 2, 50);
-
+    
     // setup for temp_hum sensor ---------------------------------
     Wire.begin();
     Wire.setClock(400000);
     tempHumSensor.begin();
-
+    
     // setup for LED strip ----------------------------------------
     strip.begin(); // INITIALIZE NeoPixel strip object
     strip.show();  // Turn OFF all pixels ASAP
     strip.setBrightness(BRIGHTNESS);
-
+    
+    // random generation of data --------------------------------
+    for (int i = 0; i < dataLen; i++)
+    {
+        dataLog[i][0] = i * 1000;
+        dataLog[i][1] = rand() % 50 + rand() % 100 / 100.0;
+        dataLog[i][2] = rand() % 100 + rand() % 100 / 100.0;
+        dataLog[i][3] = rand() % 900 + 100;
+        dataLog[i][4] = rand() % 256;
+        posData = i;
+    }
     // all tasks creations ---------------------------------------
 
     xTaskCreate(
