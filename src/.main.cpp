@@ -1,36 +1,27 @@
 #include <Arduino.h>
-#include <MHZ19.h>
+#include <MHZ19PWM.h>
 #include <hmi.h>
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
 #include <Adafruit_NeoPixel.h>
 #include ".PIDcontroller.h"
+#include <Arduino_GFX_Library.h>
 
 // testing variables----------------------------------
 short R[8] = {5, 6, 7, 8, 9, 10, 11, 12};
 int LED[4] = {5, 6, 7, 12};
 
-const short dataLen = 8 * 60; // how many data snapshots are kept, 10000 min=1 week 200kB
+const short dataLen = 6*60; // how many data snapshots are kept, 10000 min=1 week 200kB
 float dataLog[dataLen][5];    // 2d array to store the values
 unsigned long timeOfLastLog = 0;
 short posData = 0; // keeps track of which row of the array is the current one
 //-----------------------------------------------------
+int pwmpin = 3;
 
 // pins ----------------------------------------------
 const int LED_PIN = 6; // TODO: choose a real pin for LED
 //-----------------------------------------------------
 
-// objects --------------------------------------------
-CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
-Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
-Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
-MHZ19 CO2sensor(&Serial1);
-PIDcontroller tempController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);     // TODO: find the constants and setpoint
-PIDcontroller humidityController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); // TODO: find the constants and setpoint
-PIDcontroller co2Controller(2.0, 0, 0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);          // TODO: find kp  and set point. ki and kd are zero
-//-----------------------------------------------------
 
 // global variables -----------------------------------
 volatile float currentTemperature = 20;
@@ -45,6 +36,19 @@ volatile uint8_t targetLight = 20;
 const int LED_COUNT = 60; // TODO : put number of LEDS in strip
 const int BRIGHTNESS = 50;
 const int FADE_DELAY_MS = 10;
+// objects --------------------------------------------
+CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
+Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
+Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
+
+MHZ19PWM CO2sensor(3, MHZ_CONTINUOUS_MODE);
+
+PIDcontroller tempController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);     // TODO: find the constants and setpoint
+PIDcontroller humidityController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); // TODO: find the constants and setpoint
+PIDcontroller co2Controller(2.0, 0, 0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);          // TODO: find kp  and set point. ki and kd are zero
+//-----------------------------------------------------
 //-----------------------------------------------------
 
 // Mutex for protecting parameters data access --------
@@ -326,7 +330,7 @@ void setup()
         Serial.println("Error: Failed to create sensor data mutex.");
         // Handle error, maybe halt execution or retry
     }
-    hmi1.drawText("test", 2, 50);
+    
 
     
     // setup for screen -----------------------------------------
@@ -427,14 +431,28 @@ void setup()
     );
 
     // end of tasks -----------------------------------------------
-
+    CO2sensor.useLimit(5000);
     // starts scheduler and never leaves it!
-    vTaskStartScheduler();
+    //vTaskStartScheduler();
+    
 }
 
 void loop()
 {
+    gfx->fillScreen(BLACK);
+    hmi1.drawText("Loop",2,50);
+    hmi1.currentParameter=HMI::parameter(3);
+    currentCO2=CO2sensor.getCO2();
+    delay(500);
+    gfx->fillScreen(BLACK);
+    hmi1.writeToScreen(currentCO2,targetCO2);
+    delay(5);
+    
+
     /* THE SECRET MUSHROOM SOCIETY WILL LIVE FOREVER
+    
+
+
 
            ____
         _.-'78o `"`--._
