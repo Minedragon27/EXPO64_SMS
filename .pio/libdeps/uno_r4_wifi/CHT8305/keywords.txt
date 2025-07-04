@@ -1,0 +1,73 @@
+# Syntax Colouring Map For CHT8305
+
+# Data types (KEYWORD1)
+CHT8305	KEYWORD1
+
+
+# Methods and Functions (KEYWORD2)
+begin	KEYWORD2
+isConnected	KEYWORD2
+getAddress	KEYWORD2
+
+read	KEYWORD2
+readTemperature	KEYWORD2
+readHumidity	KEYWORD2
+
+lastRead	KEYWORD2
+getHumidity	KEYWORD2
+getTemperature	KEYWORD2
+setConversionDelay	KEYWORD2
+getConversionDelay	KEYWORD2
+
+setHumidityOffset	KEYWORD2
+setTemperatureOffset	KEYWORD2
+getHumidityOffset	KEYWORD2
+getTemperatureOffset	KEYWORD2
+
+setConfigRegister	KEYWORD2
+getConfigRegister	KEYWORD2
+
+softReset	KEYWORD2
+setI2CClockStretch	KEYWORD2
+getI2CClockStretch	KEYWORD2
+setHeaterOn	KEYWORD2
+getHeater	KEYWORD2
+
+setMeasurementMode	KEYWORD2
+getMeasurementMode	KEYWORD2
+getVCCstatus	KEYWORD2
+setTemperatureResolution	KEYWORD2
+getTemperatureResolution	KEYWORD2
+
+setHumidityResolution	KEYWORD2
+getHumidityResolution	KEYWORD2
+setVCCenable	KEYWORD2
+getVCCenable	KEYWORD2
+
+setAlertTriggerMode	KEYWORD2
+getAlertTriggerMode	KEYWORD2
+getAlertPendingStatus	KEYWORD2
+getAlertHumidityStatus	KEYWORD2
+getAlertTemperatureStatus	KEYWORD2
+
+setAlertLevels	KEYWORD2
+getAlertLevelTemperature	KEYWORD2
+getAlertLevelHumidity	KEYWORD2
+
+getVoltage	KEYWORD2
+
+getManufacturer	KEYWORD2
+getVersionID	KEYWORD2
+
+
+# Constants (LITERAL1)
+CHT8305_LIB_VERSION	LITERAL1
+CHT8305_DEFAULT_ADDRESS	LITERAL1
+
+
+CHT8305_OK	LITERAL1
+CHT8305_ERROR_ADDR	LITERAL1
+CHT8305_ERROR_I2C	LITERAL1
+CHT8305_ERROR_CONNECT	LITERAL1
+CHT8305_ERROR_LASTREAD	LITERAL1
+
