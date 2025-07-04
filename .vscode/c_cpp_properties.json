@@ -10,6 +10,7 @@
             "includePath": [
                 "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/include",
                 "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/src",
+                "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_FreeRTOS/src",
                 "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/.pio/libdeps/uno_r4_wifi/Adafruit NeoPixel",
                 "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/.pio/libdeps/uno_r4_wifi/GFX Library for Arduino/src",
                 "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/.pio/libdeps/uno_r4_wifi/CHT8305",
@@ -25,7 +26,6 @@
                 "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/variants/UNOWIFIR4",
                 "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/AnalogWave",
                 "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_CAN/src",
-                "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_FreeRTOS/src",
                 "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_LED_Matrix/src",
                 "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/BlockDevices",
                 "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/EEPROM/src",
@@ -50,6 +50,7 @@
                 "path": [
                     "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/include",
                     "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/src",
+                    "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_FreeRTOS/src",
                     "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/.pio/libdeps/uno_r4_wifi/Adafruit NeoPixel",
                     "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/.pio/libdeps/uno_r4_wifi/GFX Library for Arduino/src",
                     "C:/Users/Ivan Ivanov/Desktop/University/EXPO mushroom/Software stuff/Code/EXPO64_SMS/.pio/libdeps/uno_r4_wifi/CHT8305",
@@ -65,7 +66,6 @@
                     "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/variants/UNOWIFIR4",
                     "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/AnalogWave",
                     "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_CAN/src",
-                    "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_FreeRTOS/src",
                     "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/Arduino_LED_Matrix/src",
                     "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/BlockDevices",
                     "C:/Users/Ivan Ivanov/.platformio/packages/framework-arduinorenesas-uno/libraries/EEPROM/src",
