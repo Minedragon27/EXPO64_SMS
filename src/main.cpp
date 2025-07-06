@@ -20,17 +20,6 @@ short posData = 0; // keeps track of which row of the array is the current one
 const int LED_PIN = 6; // TODO: choose a real pin for LED
 //-----------------------------------------------------
 
-// objects --------------------------------------------
-CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
-HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
-Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
-Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
-MHZ19 CO2sensor(&Serial1);
-PIDcontroller tempController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);     // TODO: find the constants and setpoint
-PIDcontroller humidityController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); // TODO: find the constants and setpoint
-PIDcontroller co2Controller(2.0, 0, 0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);          // TODO: find kp  and set point. ki and kd are zero
-//-----------------------------------------------------
 
 // global variables -----------------------------------
 volatile float currentTemperature = 20;
@@ -45,6 +34,18 @@ volatile uint8_t targetLight = 20;
 const int LED_COUNT = 60; // TODO : put number of LEDS in strip
 const int BRIGHTNESS = 50;
 const int FADE_DELAY_MS = 10;
+//-----------------------------------------------------
+
+// objects --------------------------------------------
+CHT8305 tempHumSensor(0x40); // temperature and humidity sensor
+Arduino_DataBus *bus = new Arduino_SWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, -1);
+Arduino_GFX *gfx = new Arduino_ST7735(bus, TFT_RST, 1 /* rotation */, false /* IPS */); // objects used for LCD screen
+HMI hmi1 = HMI(1, 2, 3, 4, R, LED, gfx);
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRBW + NEO_KHZ800);
+MHZ19 CO2sensor(&Serial1);
+PIDcontroller tempController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);     // TODO: find the constants and setpoint
+PIDcontroller humidityController(2.0, 0.5, 1.0, 50.0, 0.0, 100.0f, 0.0f, 100.0f); // TODO: find the constants and setpoint
+PIDcontroller co2Controller(2.0, 0, 0, 50.0, 0.0, 100.0f, 0.0f, 100.0f);          // TODO: find kp  and set point. ki and kd are zero
 //-----------------------------------------------------
 
 // Mutex for protecting parameters data access --------
@@ -62,6 +63,7 @@ void actuateTemperature(void *parameters)
         {
             // PID controller here
             // to finish in a diferent branch?
+            
         }
     }
 }
@@ -322,7 +324,7 @@ void dataOutput(void *parameters)
         Serial.println("end_transmission");
     }
 }
-//----------------------------------------
+//------------------------------------------------------
 
 void setup()
 {
@@ -375,7 +377,7 @@ void setup()
 
     xTaskCreate(
         UpdateTargetParameters,
-        "updates the target parameners accordingly to user input",
+        "updates the target parameters accordingly to user input",
         configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
