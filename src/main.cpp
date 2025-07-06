@@ -8,9 +8,9 @@
 
 // testing variables----------------------------------
 short R[8] = {5, 6, 7, 8, 9, 10, 11, 12};
-int LED[4] = {5, 6, 7, 12};
+int LED[4] = {5, 6, 7, 12};// leds of HMI, not existent anymore
 
-const short dataLen = 8 * 60; // how many data snapshots are kept, 10000 min=1 week 200kB
+const short dataLen =  4 * 60; // how many data snapshots are kept, 10000 min=1 week 200kB 
 float dataLog[dataLen][5];    // 2d array to store the values
 unsigned long timeOfLastLog = 0;
 short posData = 0; // keeps track of which row of the array is the current one
@@ -100,7 +100,6 @@ void actuateTemperature(void *parameters)
         vTaskDelay(pdMS_TO_TICKS(500)); // Check and adjust every 500ms
     }
 }
-
 void actuateHumidity(void *parameters)
 {
     // parameter 2 of 4: humidity
@@ -142,7 +141,6 @@ void actuateHumidity(void *parameters)
         vTaskDelay(pdMS_TO_TICKS(500)); // Check and adjust every 500ms
     }
 }
-
 void actuateCO2(void *parameters)
 {
     // parameter 3 of 4: CO2
@@ -188,7 +186,6 @@ void actuateCO2(void *parameters)
         vTaskDelay(pdMS_TO_TICKS(500)); // Check and adjust every 500ms
     }
 }
-
 void actuateLight(void *parameters)
 {
     // parameter 4 of 4: light
@@ -239,7 +236,6 @@ void actuateLight(void *parameters)
         }
     }
 }
-
 void getSensorData(void *parameters)
 {
     for (;;)
@@ -435,6 +431,7 @@ void setup()
 {
     // general setup --------------------------------------------
     Serial.begin(115200);
+
     xSensorDataMutex = xSemaphoreCreateMutex();
     if (xSensorDataMutex == NULL)
     {
@@ -448,7 +445,6 @@ void setup()
     digitalWrite(CO2_FANS_PIN, LOW);     // fans are off initially
     pinMode(PELTIER_FANS_PIN, OUTPUT);   // peltier fans
     digitalWrite(PELTIER_FANS_PIN, LOW); // fans are off initially
-    pinMode(LED_PIN, OUTPUT);            // LEDs
     pinMode(PELTIER_PIN, OUTPUT);        // peltier element
     digitalWrite(PELTIER_PIN, LOW);      // off initially
     pinMode(MIST_DISC_PIN, OUTPUT);      // misting disc
@@ -484,8 +480,8 @@ void setup()
 
     xTaskCreate(
         getSensorData,
-        "get tempHum sensor data",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        "get tempHum and CO2 sensor data",
+        configMINIMAL_STACK_SIZE + 500, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
@@ -494,7 +490,7 @@ void setup()
     xTaskCreate(
         UpdateTargetParameters,
         "updates the target parameters accordingly to user input",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        configMINIMAL_STACK_SIZE + 500, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
@@ -503,7 +499,7 @@ void setup()
     xTaskCreate(
         LogData,
         "Logs parameters data for up to 8h",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        configMINIMAL_STACK_SIZE + 300, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
@@ -512,7 +508,7 @@ void setup()
     xTaskCreate(
         dataOutput,
         "Outputs the data on serial upon user request",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        configMINIMAL_STACK_SIZE + 300, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
@@ -521,7 +517,7 @@ void setup()
     xTaskCreate(
         actuateTemperature,
         "Actuates the peltier element + fans with PID control",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        configMINIMAL_STACK_SIZE + 200, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
@@ -529,7 +525,7 @@ void setup()
     xTaskCreate(
         actuateHumidity,
         "Actuates mist disk with PID control",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        configMINIMAL_STACK_SIZE + 200, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
@@ -537,7 +533,7 @@ void setup()
     xTaskCreate(
         actuateCO2,
         "Actuates fans with P control",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        configMINIMAL_STACK_SIZE+ 200, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
@@ -545,7 +541,7 @@ void setup()
     xTaskCreate(
         actuateLight,
         "Turns on the LEDs.",
-        configMINIMAL_STACK_SIZE, // stack size, this is 512 bytes
+        configMINIMAL_STACK_SIZE + 200, // stack size, this is 512 bytes
         NULL,                     // task parameters
         1,                        // task priority
         NULL                      // task handle
