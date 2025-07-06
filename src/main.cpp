@@ -195,12 +195,23 @@ void actuateLight(void *parameters)
     // actuator: LED strip
     for (;;)
     {
-        if (currentLight != targetLight)
+        float current_light_val = 0;
+        float target_light_val = 0;
+
+        // Acquire mutex to read shared data
+        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
         {
-            if (currentLight < targetLight)
+            current_light_val = currentLight;
+            target_light_val = targetLight;
+            xSemaphoreGive(xSensorDataMutex); // Release mutex immediately after reading
+        }
+
+        if (current_light_val != target_light_val)
+        {
+            if (current_light_val < target_light_val)
             {
                 // Brighten
-                for (int j = currentLight; j <= targetLight; j++)
+                for (int j = current_light_val; j <= target_light_val; j++)
                 {
                     for (uint16_t i = 0; i < strip.numPixels(); i++)
                     {
@@ -208,13 +219,13 @@ void actuateLight(void *parameters)
                     }
                     strip.show();
                     vTaskDelay(pdMS_TO_TICKS(FADE_DELAY_MS));
-                    currentLight = j; // Update currentLight as we fade
+                    current_light_val = j; // Update currentLight as we fade
                 }
             }
             else
             {
                 // Darken
-                for (int j = currentLight; j >= targetLight; j--)
+                for (int j = current_light_val; j >= target_light_val; j--)
                 {
                     for (uint16_t i = 0; i < strip.numPixels(); i++)
                     {
@@ -222,7 +233,7 @@ void actuateLight(void *parameters)
                     }
                     strip.show();
                     vTaskDelay(pdMS_TO_TICKS(FADE_DELAY_MS));
-                    currentLight = j; // Update currentLight as we fade
+                    current_light_val = j; // Update currentLight as we fade
                 }
             }
         }
