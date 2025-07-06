@@ -17,11 +17,10 @@ short posData = 0; // keeps track of which row of the array is the current one
 //-----------------------------------------------------
 
 // pins ----------------------------------------------
-const int LED_PIN = 6; // TODO: choose a real pin for LED
-const int CO2_FANS_PIN = 7; // TODO: choose the real pin for the side fans
+const int LED_PIN = 6;          // TODO: choose a real pin for LED
+const int CO2_FANS_PIN = 7;     // TODO: choose the real pin for the side fans
 const int PELTIER_FANS_PIN = 8; // TODO: choose the real pin for the peltier fans
 //-----------------------------------------------------
-
 
 // global variables -----------------------------------
 volatile float currentTemperature = 20;
@@ -65,7 +64,6 @@ void actuateTemperature(void *parameters)
         {
             // PID controller here
             // to finish in a diferent branch?
-            
         }
     }
 }
@@ -87,14 +85,45 @@ void actuateCO2(void *parameters)
 {
     // parameter 3 of 4: CO2
     // actuator: 2 40x40x10 fans
+
     for (;;)
     {
-        if (currentCO2 != targetCO2)
-        {
-            // P controller here
-            
+        float current_co2_val = 0;
+        float target_co2_val = 0;
 
+        // Acquire mutex to read shared data
+        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
+        {
+            current_co2_val = currentCO2;
+            target_co2_val = targetCO2;
+            xSemaphoreGive(xSensorDataMutex); // Release mutex immediately after reading
         }
+
+        // Update the setpoint of the CO2 controller with the current target
+        co2Controller.setSetpoint(target_co2_val);
+
+        // calculate the PID output. For a P-controller like this,
+        // if currentCO2 > targetCO2, error (_setpoint - measuredValue) will be negative.
+        // a positive Kp will then result in a negative output.
+        float pidOutput = co2Controller.calculatePID(current_co2_val);
+
+        // Decision logic for ON/OFF fans:
+        // If the PID output is negative (meaning current CO2 is higher than target CO2
+        // and needs to be reduced), turn the fans ON.
+        // threshold can be adjusted depending on how sensitive it needs to be
+        // for example, if pidOutput < -10.0 for more aggressive action.
+        if (pidOutput < 0)
+        {
+            digitalWrite(CO2_FAN_PIN, HIGH); // Turn fans ON
+            // Serial.println("CO2 fans ON"); 
+        }
+        else
+        {
+            digitalWrite(CO2_FAN_PIN, LOW); // Turn fans OFF
+            // Serial.println("CO2 fans OFF"); 
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(500)); // Check and adjust every 500ms
     }
 }
 
