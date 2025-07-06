@@ -62,11 +62,42 @@ void actuateTemperature(void *parameters)
     // actuator: peltier + 2 60x60x10 fans
     for (;;)
     {
-        if (currentTemperature != targetTemperature)
+        float current_temp_val = 0;
+        float target_temp_val = 0;
+
+        // Acquire mutex to read shared data
+        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
         {
-            // PID controller here
-            // to finish in a diferent branch?
+            current_temp_val = currentTemperature;
+            target_temp_val = targetTemperature;
+            xSemaphoreGive(xSensorDataMutex); // Release mutex immediately after reading
         }
+
+        // Update the setpoint of the temperature controller with the current target
+        tempController.setSetpoint(target_temp_val);
+
+        // calculate the PID output.
+        // if currentTemperature < targetTemperature, error will be positive, output will be positive (heating needed)
+        // if currentTemperature >= targetTemperature, error will be zero or negative, output will clamp at 0.0 (no heating needed)
+        // currently only able to heat up!
+        float pidOutput = tempController.calculatePID(current_temp_val);
+
+        // decision logic for ON/OFF Peltier and fans
+        // if the PID output is greater than 0, it means the controller wants to heat
+        if (pidOutput > 0)
+        {
+            digitalWrite(PELTIER_PIN, HIGH);      // Turn Peltier ON
+            digitalWrite(PELTIER_FANS_PIN, HIGH); // Turn Peltier fans ON
+            // Serial.println("Peltier & Fans ON, PID Output: " + String(pidOutput)); // For debugging
+        }
+        else
+        {
+            digitalWrite(PELTIER_PIN, LOW);      // Turn Peltier OFF
+            digitalWrite(PELTIER_FANS_PIN, LOW); // Turn Peltier fans OFF
+            // Serial.println("Peltier & Fans OFF, PID Output: " + String(pidOutput)); // For debugging
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(500)); // Check and adjust every 500ms
     }
 }
 
@@ -100,7 +131,7 @@ void actuateHumidity(void *parameters)
         if (pidOutput > 0)
         {
             digitalWrite(MIST_DISC_PIN, HIGH); // Turn mist disc ON
-            // Serial.println("Mist disc ON, PID Output: " + String(pidOutput)); 
+            // Serial.println("Mist disc ON, PID Output: " + String(pidOutput));
         }
         else
         {
