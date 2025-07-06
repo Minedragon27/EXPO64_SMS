@@ -15,7 +15,7 @@
 class PIDcontroller
 {
 public:
-// Constructor declaration and inline definition
+    // Constructor declaration and inline definition
     PIDcontroller(float kp, float ki, float kd,
                   float setpoint, float integralMin = 0.0,
                   float integralMax = 100.0, float outputMin = 0.0,
@@ -34,19 +34,38 @@ public:
     }
 
     // Set PID gains
-    void setGains(float kp, float ki, float kd);
+    void setGains(float kp, float ki, float kd)
+    {
+        _kp = kp;
+        _ki = ki;
+        _kd = kd;
+    }
 
     // Set desired setpoint
-    void setSetpoint(float setpoint);
+    void setSetpoint(float setpoint)
+    {
+        _setpoint = setpoint;
+    }
 
     // Set integral windup limits
-    void setIntegralLimits(float min, float max);
+    void setIntegralLimits(float min, float max)
+    {
+        _integralMin = min;
+        _integralMax = max;
+    }
 
     // Set output limits (e.g., duty cycle 0-100%)
-    void setOutputLimits(float min, float max);
-
+    void setOutputLimits(float min, float max)
+    {
+        _outputMin = min;
+        _outputMax = max;
+    }
     // Reset integral and previous error
-    void reset();
+    void reset()
+    {
+        _integral = 0.0f;
+        _previousError = 0.0f;
+    }
 
     // Compute PID output given the current measured value
     // to be called in the control task i think
