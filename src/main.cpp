@@ -18,6 +18,8 @@ short posData = 0; // keeps track of which row of the array is the current one
 
 // pins ----------------------------------------------
 const int LED_PIN = 6; // TODO: choose a real pin for LED
+const int CO2_FANS_PIN = 7; // TODO: choose the real pin for the side fans
+const int PELTIER_FANS_PIN = 8; // TODO: choose the real pin for the peltier fans
 //-----------------------------------------------------
 
 
@@ -90,7 +92,8 @@ void actuateCO2(void *parameters)
         if (currentCO2 != targetCO2)
         {
             // P controller here
-            //
+            
+
         }
     }
 }
