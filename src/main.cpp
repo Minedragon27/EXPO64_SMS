@@ -21,6 +21,7 @@ const int LED_PIN = 6;          // TODO: choose the real pin for LED
 const int CO2_FANS_PIN = 7;     // TODO: choose the real pin for the side fans
 const int PELTIER_FANS_PIN = 8; // TODO: choose the real pin for the peltier fans
 const int PELTIER_PIN = 9;      // TODO: choose the real pin
+const int MIST_DISC_PIN = 10;   // TODO: chhose the real pin
 //-----------------------------------------------------
 
 // global variables -----------------------------------
@@ -61,7 +62,7 @@ void actuateTemperature(void *parameters)
     // actuator: peltier + 2 60x60x10 fans
     for (;;)
     {
-        if (currentHumidity != targetHumidity)
+        if (currentTemperature != targetTemperature)
         {
             // PID controller here
             // to finish in a diferent branch?
@@ -75,10 +76,39 @@ void actuateHumidity(void *parameters)
     // actuator: mist disc
     for (;;)
     {
-        if (currentTemperature != targetTemperature)
+        float current_humidity_val = 0;
+        float target_humidity_val = 0;
+
+        // Acquire mutex to read shared data
+        if (xSemaphoreTake(xSensorDataMutex, portMAX_DELAY) == pdTRUE)
         {
-            // PID controller here
+            current_humidity_val = currentHumidity;
+            target_humidity_val = targetHumidity;
+            xSemaphoreGive(xSensorDataMutex); // Release mutex immediately after reading
         }
+
+        // update the setpoint of the humidity controller with the current target
+        humidityController.setSetpoint(target_humidity_val);
+
+        // calculate the PID output
+        // if currentHumidity < targetHumidity, error will be positive, output will be positive.
+        // if currentHumidity > targetHumidity, error will be negative, output will clamp at 0.0.
+        float pidOutput = humidityController.calculatePID(current_humidity_val);
+
+        // decision logic for ON/OFF mist disc
+        // If the PID output is greater than 0, it means the controller wants to humidify.
+        if (pidOutput > 0)
+        {
+            digitalWrite(MIST_DISC_PIN, HIGH); // Turn mist disc ON
+            // Serial.println("Mist disc ON, PID Output: " + String(pidOutput)); 
+        }
+        else
+        {
+            digitalWrite(MIST_DISC_PIN, LOW); // Turn mist disc OFF
+            // Serial.println("Mist disc OFF, PID Output: " + String(pidOutput));
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(500)); // Check and adjust every 500ms
     }
 }
 
@@ -115,13 +145,13 @@ void actuateCO2(void *parameters)
         // for example, if pidOutput < -10.0 for more aggressive action.
         if (pidOutput < 0)
         {
-            digitalWrite(CO2_FAN_PIN, HIGH); // Turn fans ON
-            // Serial.println("CO2 fans ON"); 
+            digitalWrite(CO2_FANS_PIN, HIGH); // Turn fans ON
+            // Serial.println("CO2 fans ON");
         }
         else
         {
-            digitalWrite(CO2_FAN_PIN, LOW); // Turn fans OFF
-            // Serial.println("CO2 fans OFF"); 
+            digitalWrite(CO2_FANS_PIN, LOW); // Turn fans OFF
+            // Serial.println("CO2 fans OFF");
         }
 
         vTaskDelay(pdMS_TO_TICKS(500)); // Check and adjust every 500ms
@@ -372,12 +402,15 @@ void setup()
     hmi1.drawText("test", 2, 50);
 
     // pins -----------------------------------------------------
-    pinMode(CO2_FAN_PIN, OUTPUT); // CO2 fans
-    digitalWrite(CO2_FAN_PIN, LOW); // fans are off initially
-    pinMode(PELTIER_FANS_PIN, OUTPUT); // peltier fans
-    digitalWrite(PELTIER_FANS_PIN, LOW); // fans are off initially   
-    pinMode(LED_PIN, OUTPUT); // LEDs
-
+    pinMode(CO2_FANS_PIN, OUTPUT);       // CO2 fans
+    digitalWrite(CO2_FANS_PIN, LOW);     // fans are off initially
+    pinMode(PELTIER_FANS_PIN, OUTPUT);   // peltier fans
+    digitalWrite(PELTIER_FANS_PIN, LOW); // fans are off initially
+    pinMode(LED_PIN, OUTPUT);            // LEDs
+    pinMode(PELTIER_PIN, OUTPUT);        // peltier element
+    digitalWrite(PELTIER_PIN, LOW);      // off initially
+    pinMode(MIST_DISC_PIN, OUTPUT);      // misting disc
+    digitalWrite(MIST_DISC_PIN, LOW);    // off initially
 
     // setup for screen -----------------------------------------
     gfx->begin(); // initialize screen
