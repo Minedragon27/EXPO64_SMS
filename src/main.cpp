@@ -4,7 +4,7 @@
 #include <CHT8305.h>
 #include <Arduino_FreeRTOS.h>
 #include <Adafruit_NeoPixel.h>
-#include ".PIDcontroller.h"
+#include "PIDcontroller.h"
 
 // testing variables----------------------------------
 short R[8] = {5, 6, 7, 8, 9, 10, 11, 12};
@@ -17,9 +17,10 @@ short posData = 0; // keeps track of which row of the array is the current one
 //-----------------------------------------------------
 
 // pins ----------------------------------------------
-const int LED_PIN = 6;          // TODO: choose a real pin for LED
+const int LED_PIN = 6;          // TODO: choose the real pin for LED
 const int CO2_FANS_PIN = 7;     // TODO: choose the real pin for the side fans
 const int PELTIER_FANS_PIN = 8; // TODO: choose the real pin for the peltier fans
+const int PELTIER_PIN = 9;      // TODO: choose the real pin
 //-----------------------------------------------------
 
 // global variables -----------------------------------
@@ -369,6 +370,14 @@ void setup()
         // Handle error, maybe halt execution or retry
     }
     hmi1.drawText("test", 2, 50);
+
+    // pins -----------------------------------------------------
+    pinMode(CO2_FAN_PIN, OUTPUT); // CO2 fans
+    digitalWrite(CO2_FAN_PIN, LOW); // fans are off initially
+    pinMode(PELTIER_FANS_PIN, OUTPUT); // peltier fans
+    digitalWrite(PELTIER_FANS_PIN, LOW); // fans are off initially   
+    pinMode(LED_PIN, OUTPUT); // LEDs
+
 
     // setup for screen -----------------------------------------
     gfx->begin(); // initialize screen
