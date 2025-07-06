@@ -20,6 +20,8 @@ void setup()
     Serial.begin(115200);
     Serial.println("--- start setup ---");
 
+    pinMode(LED_PIN, OUTPUT);       
+
     strip.begin();
     strip.show();                    // Turn OFF all pixels
     strip.setBrightness(BRIGHTNESS); // Set overall brightness
